@@ -1,0 +1,937 @@
+<?xml version="1.0" encoding="utf-8"?>
+<minituto id="494982" generator="VT 3.5.2" language="zCode">
+  <titre>
+    <![CDATA[Maîtrisez les nombres à virgule en C]]>
+  </titre>
+  <avancement>
+    <![CDATA[90]]>
+  </avancement>
+  <licence>
+    <![CDATA[6]]>
+  </licence>
+  <difficulte>
+    <![CDATA[5]]>
+  </difficulte>
+  <temps>
+    <![CDATA[187]]>
+  </temps>
+  <introduction>
+    <![CDATA[<position valeur="justifie">Vous souhaitez manipuler dans vos programmes en C de très grands nombres et/ou des nombres à virgule ? Ou alors vous avez déjà essayé mais vous rencontrez des problèmes incompréhensibles ? Ce cours vous est destiné !
+Vous y apprendrez tout ce qu'il faut savoir sur les nombres à virgule en C.
+
+Au programme :
+<liste><puce>quelques rappels (ou pas) sur les nombres à virgule en C (types, syntaxe…) ;</puce><puce>la représentation en mémoire d'un nombre à virgule dite "flottante" (selon la norme IEEE 754), et les propriétés qui en découlent (valeurs possibles, etc.) ;</puce><puce>les inconvénients des nombres à virgule flottante en C ;</puce><puce>effectuer une comparaison de nombres flottants ;</puce><puce>le point de vue de la norme C, et les implémentations.</puce></liste>
+Prérequis :
+<liste><puce>connaître un minimum le langage C ! Au moins jusqu'au chapitre sur les pointeurs (chapitre 2 de la partie II) du <lien url="http://www.siteduzero.com/tutoriel-3-14189-apprenez-a-programmer-en-c.html">tutoriel de M@teo21</lien> si vous le suivez ;</puce><puce>avoir quelques notions mathématiques (rien de bien méchant) sur les puissances (de 10 et de 2, dans notre cas), et idéalement les bases numériques (mais ce n'est pas indispensable) ;</puce><puce>maîtriser les notions de bit, d'octet, de binaire, etc., ainsi que les deux façons principales de représenter un nombre relatif en mémoire (le bit de signe ou le complément à 2) ; si ce n'est pas le cas, vous pouvez lire <lien url="http://www.siteduzero.com/tutoriel-3-32169-les-variables-leur-vrai-visage.html">ce tutoriel sur le "vrai visage des variables" en mémoire</lien> ;</puce><liste><puce><lien url="http://www.siteduzero.com/tutoriel-3-509205-un-ordinateur-c-est-tres-bete-ca-ne-sait-pas-compter-jusqu-a-deux.html">ce tutoriel-ci</lien>, à la fois clair et complet, vous introduit toutes les notions listées ci-dessus, et je vous invite à le lire s'il vous manque quelque chose (arrêtez-vous après avoir lu la partie sur les nombres entiers, la suite gâcherait mon suspense) ;</puce></liste><puce>être motivé et curieux ; :ange: </puce><puce><italique>that's all!</italique></puce></liste>
+</position>]]>
+  </introduction>
+  <sousparties>
+    
+      <souspartie id="495024">
+	<titre>
+	  <![CDATA[Les bases de l'utilisation des nombres à virgule en C]]>
+	</titre>
+	<texte>
+	  <![CDATA[<position valeur="justifie">Tout d'abord, une présentation des <gras><couleur nom="orange">nombres à virgule flottante</couleur></gras> !
+
+
+Bon, je ne vais pas vous expliquer ce qu'est un nombre à virgule. Si vous ne savez pas ce que c'est, ce tutoriel ne vous sera d'aucune utilité. :lol: 
+On parle de virgule <italique>flottante</italique> car on peut faire varier la place de la virgule en variant la puissance de 10 (puisque tout nombre peut être écrit avec une puissance de 10). Par exemple : 42,1337 = 42,1337 ×10<exposant>0</exposant> = 0,421337 ×10<exposant>2</exposant> = 42133,7 ×10<exposant>-3</exposant>.
+
+En informatique, on parle de virgule flottante par opposition à virgule <italique>fixe</italique>, qui indique une méthode de représentation en mémoire d'un nombre avec un nombre fixe de chiffres après la virgule. En C, nous avons des nombres à virgule flottante.
+
+
+<italique>Remarque :</italique> On parle de la <italique>partie entière</italique> pour désigner la partie qui se trouve avant la virgule, et de <italique>partie décimale</italique> (ou <italique>fractionnaire</italique>) pour celle qui se trouve après ; attention à ne pas faire de confusion avec respectivement les représentations entières (qu'on verra plus tard) et la base décimale, c'est-à-dire la base 10 (je parlerai de préférence de "base 10" pour éviter les confusions).
+Je pourrais également parler de la <italique>partie significative</italique> d'un nombre pour désigner ce nombre sans la puissance de 10 qui va derrière (c'est-à-dire l'ensemble de ses parties entière et fractionnaire) ; par exemple, 3,1416 sera la partie significative de 3,1416 ×10<exposant><italique>exposant</italique></exposant>. Attention, la partie significative varie selon l'exposant, c'est pourquoi je préciserais la notation à laquelle je me réfère (la plupart du temps, ce sera la notation scientifique).
+
+
+<titre1>La base de la base</titre1>
+
+<titre2>Les types pour représenter un nombre à virgule</titre2>
+En C, un nombre à virgule flottante peut être représenté par les types <minicode type="c">float</minicode> et <minicode type="c">double</minicode> (il existe aussi <minicode type="c">long double</minicode>). Comme pour les types entiers, leur taille en mémoire dépend de l'architecture de l'ordinateur, mais les valeurs sont très fréquemment <gras>32 bits (4 octets) pour un float</gras> et  <gras>64 bits (8 octets) pour un double</gras> (nous verrons pourquoi par la suite). Pour vous assurer de la taille chez vous, vous pouvez faire :
+<code type="c">printf("taille d'un float : %u\n", sizeof(float));printf("taille d'un double : %u\n", sizeof(double));</code>
+
+<titre2>Intérêt des nombres flottants</titre2>
+Vous pouvez utiliser les types flottants dans vos programmes si vous souhaitez manipuler des <gras>nombres à virgule</gras>, mais également pour stocker de <gras>très grands nombres</gras>. En effet, un <minicode type="c">float</minicode> permet d'atteindre 10<exposant>38</exposant>, et un <minicode type="c">double</minicode> 10<exposant>308</exposant> ! Toutefois, vous ne pourrez pas stocker tous les 38 ou 308 chiffres significatifs jusqu'au chiffre des unités (on détaillera la précision plus tard).
+
+
+<titre2>Écrire une constante</titre2>
+La syntaxe pour écrire un nombre à virgule est : <minicode type="c">-3141.59e7</minicode> (ou <minicode type="c">-3141.59E7</minicode>, avec un 'E' majuscule), ce qui signifie -3141,59 ×10<exposant>7</exposant>. Attention, on met un point et non une virgule ! La lettre 'E' collée au nombre signifie "exposant". Celui-ci peut très bien être négatif comme dans <minicode type="c">945.68e-3</minicode> (ce qui signifie 945.68 ×10<exposant>-3</exposant>).
+
+De plus, les parties du nombre (c'est-à-dire la partie à gauche ou celle à droite de la virgule, mais pas les deux, et l'exposant) qui valent 0 peuvent être omises (mais il doit y avoir au moins un point ou un exposant d'écrit, pour signifier qu'il s'agit d'un nombre à virgule). Par exemple, les constantes suivantes sont strictement identiques :<code type="c">0.0e0 ;     0.0 ; 0.e0 ;      0. ; .0e0 ;      .0 ;  0e0 ;</code>
+En revanche, écrire <minicode type="c">0</minicode> tout court produira un entier. En effet, le compilateur ne voyant ni point ni 'e', il ne peut pas savoir qu'il s'agit d'un nombre à virgule flottante.
+
+
+Le type par défaut d'une constante à virgule flottante est <minicode type="c">double</minicode>, mais on peut le changer avec un suffixe collé après la constante :
+<liste><puce>la lettre 'F' minuscule ou majuscule demande un <minicode type="c">float</minicode> ;
+</puce><puce>la lettre 'L' minuscule ou majuscule demande un <minicode type="c">long double</minicode>.
+</puce></liste>Par exemple, <minicode type="c">.1e-3f</minicode> sera de type <minicode type="c">float</minicode>, <minicode type="c">42.1337e-3l</minicode> de type <minicode type="c">long double</minicode>.
+
+
+Enfin, il peut être utile de savoir que le C99 permet aussi d'écrire ses constantes flottantes en hexadécimal ! :diable: Pour cela :<liste><puce>ajoutez le préfixe <minicode type="c">0x</minicode> (ou <minicode type="c">0X</minicode>) avant votre constante (mais après le signe) ;</puce><puce>écrivez la partie significative en base 16 (c'est-à-dire avec les chiffres de 0 à 9 et les lettres de A à F) ;</puce><puce>l'exposant est obligatoire (à la limite, vous n'avez qu'à mettre 0) ; il doit être écrit en base 10 comme d'habitude (et non en hexadécimal), mais précédé de la lettre p (ou P) au lieu de e. De plus, il se réfère à une puissance de <gras>2</gras> et non de 10.</puce></liste>Par exemple, <minicode type="c">-0xC45.8p3</minicode> signifie - <taille valeur="tpetit">0x</taille> C45,8 ×<gras>2</gras><exposant>3</exposant> (soit - 3141,5 ×2<exposant>3</exposant> = - 25 132).
+
+L'intérêt <barre>à part faire mal au crâne</barre> ? Obtenir un nombre exact ! Les explications suivent…
+
+
+<titre1>Des constantes inexactes</titre1>
+
+Attention : <gras>tous les nombres décimaux (c'est-à-dire écrits en base 10) ne sont pas forcément représentables de façon finie en binaire, et certains sont donc arrondis</gras> ! Ainsi, 0,1 en base 10 s'écrit en binaire <taille valeur="tpetit">0b</taille>0,00011001100110011… avec une infinité de 0011 (de même que 1/3 = 0,3333… en base 10). 
+Une partie significative écrite en base 10 ainsi qu'une puissance de 10 négative (c'est-à-dire qu'on divise par une puissance de 10) peuvent donc mener à des nombres inexacts.
+
+En fait, seuls les nombres dont la partie décimale est le résultat d'une division par une puissance de 2 (comme .5 = 1/2, .75 = 3/4 ou encore .625 = 5/8) sont représentables en binaire avec un nombre fini de décimales.
+Spécifier la partie significative en hexadécimal (base 16) et l'exposant en termes de puissance de 2 permet donc un nombre exact (dans la limite de la capacité du type, bien sûr ^^ ).
+
+
+<titre1>Quelques informations pratiques</titre1>
+
+<titre2>Les fonctions d'entrée et de sortie formatées : <minicode type="c">printf</minicode> & <minicode type="c">scanf</minicode></titre2>
+Vous voudrez sûrement savoir quels sont les formateurs pour lire ou écrire des nombres flottants. Voici un petit tableau résumé. Pour des infos complètes (plus d'options) sur l'utilisation de <minicode type="c">printf</minicode> et <minicode type="c">scanf</minicode> : <acronyme valeur="Read The Funny Manual">RTFM</acronyme>, <lien url="http://linux.die.net/man/3/printf">bien</lien> <lien url="http://unixhelp.ed.ac.uk/CGI/man-cgi?scanf">sûr</lien> !
+
+<tableau><legende>Formateurs de <minicode type="c">printf</minicode> pour les flottants</legende><ligne><entete>Formateurs</entete><entete>Utilisation</entete></ligne><ligne><cellule><minicode type="c">"%f"</minicode>, <minicode type="c">"%F"</minicode></cellule><cellule>Affiche le <minicode type="c">double</minicode> "simplement", comme vous avez sans doute l'habitude de l'écrire : l'affichage est du type <minicode>[-]XXXX.XXX</minicode>, où les <minicode>X</minicode> sont des chiffres de 0 à 9 et <minicode>[-]</minicode> symbolise le "moins" éventuel.</cellule></ligne><ligne><cellule><minicode type="c">"%e"</minicode>, <minicode type="c">"%E"</minicode></cellule><cellule>Affiche le <minicode type="c">double</minicode> en écriture scientifique, c'est-à-dire avec un seul chiffre avant la virgule et un exposant introduit par la lettre 'e' (ou 'E' pour <minicode type="c">"%E"</minicode>) ; l'affichage est donc du type <minicode>[-]X.XXXXXXeYY</minicode> (ou <minicode>[-]X.XXXXXXEYY</minicode>).</cellule></ligne><ligne><cellule><minicode type="c">"%g"</minicode>, <minicode type="c">"%G"</minicode></cellule><cellule>Une sorte de "combinaison" des formateurs précédents : utilise le premier style si le nombre n'est pas trop grand ou trop petit, le deuxième style sinon.</cellule></ligne><ligne><cellule fusion_col="2">Remarquez que tous ces formateurs attendent des flottants de type <minicode type="c">double</minicode>. Il n'existe pas de formateurs pour <minicode type="c">float</minicode>, ce qui n'est pas dramatique car vous pouvez convertir vos nombres de <minicode type="c">float</minicode> vers <minicode type="c">double</minicode> pour les afficher.
+Le C99 vous permet d'ajouter la lettre 'L' majuscule entre le '%' et le formateur afin de correspondre à un <minicode type="c">long double</minicode>.</cellule></ligne></tableau>
+
+<tableau><legende>Formateurs de <minicode type="c">scanf</minicode> pour les flottants</legende><ligne><entete>Formateurs</entete><entete>Utilisation</entete></ligne><ligne><cellule><minicode type="c">"%e"</minicode>, <minicode type="c">"%E"</minicode>,
+<minicode type="c">"%f"</minicode>, <minicode type="c">"%F"</minicode>,
+<minicode type="c">"%g"</minicode>, <minicode type="c">"%G"</minicode>
+</cellule><cellule>Lit un nombre à virgule flottante et l'écrit dans la variable de type <minicode type="c">float</minicode> indiquée. Le nombre lu doit être écrit de la même manière que vous écrivez une constante dans votre code source, c'est-à-dire (vous avez déjà oublié ?) :<liste><puce>un signe éventuel, puis un nombre à virgule en base 10 (chiffres de 0 à 9), puis un exposant de 10 éventuel introduit par 'e' (ou 'E') ;</puce><puce>ou alors un signe éventuel, puis le préfixe '0x' (ou '0X'), puis un nombre à virgule en base 16 (chiffres de 0 à F), puis un exposant de 2 éventuel introduit par 'p' (ou 'P').</puce></liste>Contrairement à <minicode type="c">printf</minicode>, tous ces formateurs sont équivalents.</cellule></ligne><ligne><cellule fusion_col="2">Pour lire un <minicode type="c">double</minicode>, il faut ajouter la lettre 'l' minuscule entre le '%' et le formateur ; pour un <minicode type="c">long double</minicode>, il faut ajouter 'L' (ou 'll').</cellule></ligne></tableau>
+
+<titre2>Les fonctions mathématiques avec <minicode type="c"><math.h></minicode></titre2>
+Matheux, vous serez comblés : la bibliothèque standard du C met à votre disposition toute une gamme de fonctions mathématiques. Ces fonctions sont définies dans le header <minicode type="c"><math.h></minicode>, qu'il vous faudra donc inclure dans vos sources.
+
+À titre indicatif, voici une liste des fonctions que vous pourrez trouver dans <minicode type="c"><math.h></minicode> :
+<secret><code type="c" titre="Liste des fonctions de <math.>">#include <math.h>/** fonctions courantes **/double pow(double x, double n);   // x à la puissance ndouble sqrt(double);   // racine carréedouble cbrt(double);   // [C99] racine cubiquedouble fabs(double);           // valeur absoluedouble fdim(double, double);   // [C99] différence positivedouble fmin(double, double);   // [C99] minimumdouble fmax(double, double);   // [C99] maximum/** fonctions trigonométriques (les angles sont en radians) **/double cos(double);   // cosinusdouble sin(double);   // sinusdouble tan(double);   // tangentedouble acos(double);  // arc-cosinusdouble asin(double);  // arc-sinusdouble atan(double);  // arc-tangentedouble atan2(double y, double x);  /* arc-tangente avec 2 arguments : angle entre l'axe                                      des abscisses et le point de coordonnées (x ; y) ;                                      attention, y est le 1er argument ! */double cosh(double);  // cosinus hyperboliquedouble sinh(double);  // sinus hyperboliquedouble tanh(double);  // tangente hyperboliquedouble acosh(double);  // [C99] arc-cosinus hyperboliquedouble asinh(double);  // [C99] arc-sinus hyperboliquedouble atanh(double);  // [C99] arc-tangente hyperbolique/** arrondis, parties entière et fractionnaire **/double          round(double);   // [C99] arrondi à l'entier, tel que round(.5)==1long int       lround(double);   // [C99] idemlong long int llround(double);   // [C99] idemdouble          rint(double);   // [C99] arrondi à l'entier suivant le mode d'arrondi  [1]long int       lrint(double);   // [C99] idemlong long int llrint(double);   // [C99] idemdouble nearbyint(double)   /* [C99] arrondi à l'entier suivant le mode d'arrondi,                              sans lever d'exception "inexact"  [1] */double ceil(double);   // arrondi à l'entier supérieurdouble floor(double);  // arrondi à l'entier inférieurdouble trunc(double);   // [C99] partie entière (troncature)double modf(double, double*);   /* retourne la partie fractionnaire et écrit la partie                                   entière dans le nombre pointé *//** exponentielles, logarithmes & co. **/double exp(double);       // fonction exponentielledouble expm1(double x);   // [C99] équivalent à exp(x)-1, mais plus précisdouble exp2(double x);    // [C99] 2 à la puissance xdouble log(double);       // logarithme naturel (ou "népérien")double log1p(double x);   // [C99] équivalent à log(1+x), mais plus précisdouble log10(double);     // logarithme en base 10double log2(double);      // [C99] logarithme en base 2double logb(double x);    /* [C99] logarithme entier en base 2 (équivalent à                             floor(log2(x)), mais plus rapide)  [2] */int    ilogb(double);     // [C99] idemdouble scalbn(double x, int n);     // [C99] x * 2^n  [2]double scalbln(double, long int);   // [C99] idemdouble ldexp(double x, int n);   // x * 2^ndouble frexp(double x, int*);    /* fraction normalisée : écrit un exposant EXP dans l'entier                                    pointé et renvoie une valeur A, tels que x == A / (2^EXP) ;                                    A est compris entre 0.5 inclus et 1 exclus *//** plus de fonctions **/double fmod(double, double);        // reste de la divisiondouble remainder(double, double);   // [C99] idem (avec une subtile nuance)double hypot(double, double);   /* [C99] hypoténuse du triangle rectangle dont les deux                                   autres côtés sont donnés */double erf(double);    // [C99] fonction d'erreur de Gaussdouble erfc(double);   // [C99] fonction d'erreur complémentairedouble tgamma(double);   // [C99] fonction gammadouble lgamma(double);   // [C99] logarithme naturel de la valeur absolue de la fonction gammadouble copysign(double x, double y);   // [C99] valeur de x avec le signe de ydouble fma(double x, double y, double z)   // [C99] x*y + zdouble nextafter(double x, double y);     /* [C99] prochaine valeur flottante représentable                                             après x (vers y) */double nexttoward(double, long double);   // [C99] idem/** NOTES :[1] Modes d'arrondis, exceptions : on verra ça plus tard.[2] En fait, j'ai mis 2 pour simplifier, mais en réalité il s'agit de FLT_RADIX    (une constante définie dans le header <float.h> et dont vous n'avez pas encore    les connaissances requises pour en comprendre le sens) ; FLT_RADIX vaut probablement 2.**/</code></secret>
+Cette liste n'est absolument pas à connaître par cœur ! Elle n'est là que pour vous donner une idée de ce que vous pouvez faire. D'ailleurs, les explications sont très succinctes et je vous invite à consulter le manuel qui est fait pour ça si vous souhaitez plus d'informations sur une fonction donnée (tout ça pour ne pas dire encore une fois : <acronyme valeur="Read That Fancy Manual, nom d'un chien !">RTFM</acronyme>…).
+De plus, chacune des fonctions listées ci-dessus se décline en fait en trois versions :<liste><puce>une qui travaille avec des <minicode type="c">double</minicode> : celle présentée ;</puce><puce>une qui travaille avec des <minicode type="c">float</minicode> : il faut ajouter la lettre 'f' à la fin du nom de la fonction ;</puce><puce>une qui travaille avec des <minicode type="c">long double</minicode> : il faut ajouter la lettre 'l' à la fin du nom de la fonction.</puce></liste>
+Vous devez néanmoins retenir une chose. Ces fonctions ne sont pas incluses dans l'exécutable avec le reste de la bibliothèque standard, lors de l'édition des liens (la phase suivant la compilation). Il faut les lier manuellement.
+Sous GCC, cela se fait en passant le paramètre <minicode type="console">-lm</minicode> lors de cette phase.
+Si vous travaillez avec Code::Blocks, alors il est probable que ce dernier ajoute automatiquement cette liaison. Si ce n'est pas le cas, vous pouvez suivre la démarche suivante :<liste><puce><italique><souligne>P</souligne>roject</italique> > <italique>Build options…</italique> > onglet <italique>Linker settings</italique> ;</puce><puce>dans le champ <italique>Link libraries</italique> (à gauche), cliquez sur <touche>Add</touche> et entrez le nom de la bibliothèque à lier, soit « m », puis validez ;</puce><puce>autre possibilité pour cette dernière étape : taper simplement « -lm » dans le champ <italique>Other linker options</italique> (à gauche).</puce><puce>Voilà, les fonctions de <minicode type="c"><math.h></minicode> seront désormais incluses dans vos programmes !</puce></liste>
+
+Voilà, on a fini avec les fondamentaux. Vous avez maintenant des connaissances suffisantes pour manier les nombres à virgule en C, <barre>vous pouvez aller jouer dans le jardin</barre> mais ce serait dommage de s'arrêter en si bon chemin… Après cette brève (<italique>hum</italique>) introduction en la matière, nous allons nous plonger au cœur des nombres flottants pour en étudier le moindre détail. Pas trop fatigué ? Il vaudrait mieux, parce qu'on vient à peine  de commencer. <italique>Yêêêhaaa !</italique>
+
+</position>]]>
+	</texte>
+      </souspartie>
+    
+      <souspartie id="495045">
+	<titre>
+	  <![CDATA[IEEE 754 : À quoi ressemble un nombre flottant en mémoire ?]]>
+	</titre>
+	<texte>
+	  <![CDATA[<position valeur="justifie">On va maintenant s'intéresser à la manière dont sont <gras>représentés</gras> en mémoire les nombres à virgule flottante ! Attention, on va faire une grosse partie théorique, alors préparez vos barres céréales en cas d'hypoglycémie. :D 
+
+
+Ce que vais vous raconter dans cette partie <gras>n'est pas dans la norme C</gras>. La suite de ce cours se base sur la <gras><couleur nom="orange">norme IEEE 754</couleur></gras> (ou plus précisément ANSI/IEEE Std 754-1985). Celle-ci spécifie :
+<liste><puce>la <gras>manière de représenter les nombres flottants en mémoire</gras> avec plusieurs formats ;</puce><puce>cinq <gras>opérations associées</gras> : l'addition (<minicode type="c">+</minicode>), la soustraction (<minicode type="c">-</minicode>), la multiplication (<minicode type="c">*</minicode>), la division (<minicode type="c">/</minicode>) et la racine carrée (<minicode type="c">sqrt()</minicode>) ;</puce><puce>des <gras>modes d'arrondi</gras> ;</puce><puce>des <gras>exceptions</gras>.</puce></liste>Ne vous inquiétez pas pour les deux derniers points, on en reparlera.
+
+Elle est proposée par l'IEEE (<italique>Institute of Electrical and Electronics Engineers</italique>, l'Institut des Ingénieurs Électriciens et Électroniciens), une organisation américaine qui est devenue une référence en matière d'informatique.
+Cette norme est très suivie (en fait, sur la très grande majorité des ordinateurs aujourd'hui), mais vous pouvez très bien tomber sur une implémentation qui utilise un autre mode de représentation. :( Un point sur la norme C sera fait à la fin de ce chapitre (ainsi qu'une manière de déterminer si IEEE 754 est bien employé sur votre implémentation).
+Ce format aura son importance plus loin dans ce tutoriel.
+
+
+<titre1>Principes généraux</titre1>
+
+Tout nombre à virgule peut être écrit en <gras><couleur nom="orange">notation scientifique</couleur></gras>, c'est-à-dire avec un seul chiffre avant la virgule et multiplié par une puissance de <italique>b</italique> (<italique>b</italique> étant la base dans laquelle on écrit le nombre : 10 pour la base décimale, 2 pour le binaire, 16 pour l'hexa, etc.). Par exemple, le nombre -3141,5 est égal à -3,1415 ×10<exposant>3</exposant> . L'écriture binaire de ce nombre est <taille valeur="tpetit">0b</taille> -110001000101,1, soit <taille valeur="tpetit">0b</taille> <couleur nom="rouge">-</couleur>1,<couleur nom="bleu">100010001011</couleur> ×2<exposant><couleur nom="vertf">11</couleur></exposant>.
+
+Pour stocker un nombre à virgule flottante, on se base sur sa notation binaire scientifique. En mémoire, un nombre flottant se décompose donc en <gras>3 parties</gras>. À partir du bit de poids fort, on a :<liste><puce>le <gras><couleur nom="rouge">signe</couleur></gras>, codé sur <gras>un bit</gras> : ce bit vaut 0 si le nombre est positif, 1 s'il est négatif.
+Remarquez ici que la représentation du signe des nombres flottants se fait selon le bit de poids fort et non selon la règle du complément à 2. En conséquence, il existe deux représentations pour zéro, un positif et un négatif (c'est néanmoins un défaut mineur, les implémentations gérant cette dualité ; par exemple, <minicode type="c">+0.0==-0.0</minicode> renverra vrai), et les valeurs possibles sont totalement "symétriques" par rapport à zéro (c'est la raison pour laquelle j'utiliserai souvent le symbole ±, plus ou moins, par la suite) ;
+ </puce><puce>l'<gras><couleur nom="vertf">exposant</couleur></gras>, c'est-à-dire la puissance à laquelle il faut élever <gras>2</gras> (et non 10 !).
+Le nombre de bits qu'il occupe dépend de la taille du type.
+Ce nombre est un entier et peut être négatif. Pour le représenter, on n'utilise ni la règle du bit de signe, ni celle du complément à 2 (car cela rendrait la comparaison de nombres plus difficile, comme on le verra ensuite) ; on opère un <gras>décalage de l'exposant</gras> réel en lui ajoutant <gras>2<exposant><italique>e</italique>-1</exposant>-1</gras>, où <italique>e</italique> représente le nombre de bits occupés par l'exposant ; en gros, ce nombre représente la valeur où tous les bits sauf celui de poids fort sont à 1 (c'est-à-dire 127 = <taille valeur="tpetit">0b</taille>01111111 si l'exposant est codé sur 8 bits, ou 1023 = <taille valeur="tpetit">0b</taille>01111111111 s'il est codé sur 11 bits) ;
+<information><position valeur="justifie"><italique>Remarque :</italique> Par la suite, j'emploierai les termes d'exposant "décalé" et "non-décalé" pour différencier l'exposant tel qu'il est représenté en mémoire de l'exposant ainsi représenté.</position></information> </puce><puce>la <gras><couleur nom="bleu">mantisse</couleur></gras>, c'est-à-dire la valeur de la <gras>partie décimale en notation binaire scientifique</gras> (avec un seul chiffre avant la virgule). On ne garde que la partie décimale car, du fait de la notation binaire, la partie entière est forcément égale à 1 (sauf dans les cas particuliers de zéro et de certains nombres très petits dont on reparlera). On parle de <gras><italique><couleur nom="orange">bit implicite</couleur></italique></gras> (un bit "caché" représentant la partie entière, qui ici vaudrait 1).
+On économise ainsi un bit, ce qui permet d'avoir une précision plus grande.
+La mantisse occupe les bits de poids faibles restants.</puce></liste>
+
+Les deux types du C pour les nombres à virgule flottante répondent aux deux formats spécifiés par IEEE 754.
+
+<position valeur="centre"><tableau><legende>Tableau résumé des deux formats de la norme IEEE 754</legende><ligne><entete fusion_lig="2">Nom dans la
+norme IEE 754</entete><entete fusion_lig="2">Type en C</entete><entete fusion_col="4">Taille (en bits)</entete><entete fusion_lig="2">Chiffres
+significatifs
+(en base 10)</entete><entete fusion_col="2">Valeurs absolues possibles</entete></ligne><ligne><entete>Total</entete><entete><couleur nom="rouge">s</couleur></entete><entete><couleur nom="vertf">e</couleur></entete><entete><couleur nom="bleu">m</couleur></entete><entete>minimum</entete><entete>maximum</entete></ligne><ligne><cellule><italique>simple précision</italique></cellule><cellule><minicode type="c">float</minicode></cellule><cellule>32 bits</cellule><cellule>1</cellule><cellule>8</cellule><cellule>23</cellule><cellule>7</cellule><cellule>1,2 ×10<exposant>-38</exposant></cellule><cellule>3,4 ×10<exposant>+38</exposant></cellule></ligne><ligne><cellule><italique>double précision</italique></cellule><cellule><minicode type="c">double</minicode></cellule><cellule>64 bits</cellule><cellule>1</cellule><cellule>11</cellule><cellule>52</cellule><cellule>16</cellule><cellule>2,2 ×10<exposant>-308</exposant></cellule><cellule>1,8 ×10<exposant>+308</exposant></cellule></ligne></tableau></position>
+Nous détaillerons plus tard les deux dernières colonnes.
+
+
+En résumé (pour un <minicode type="c">float</minicode> de 32 bits), la représentation de -3141,5 est :
+
+<position valeur="centre"><image legende="schéma : de l'écriture décimale à la représentation en mémoire d'un nombre flottant normalisé">http://uploads.siteduzero.com/files/322001_323000/322943.png</image></position>
+
+
+<titre1>Les différents types de nombres représentables</titre1>
+
+Il y a cependant des cas particuliers, car un nombre à virgule flottante peut représenter autre chose que des nombres "normaux". Il peut aussi valoir :
+<liste><puce><gras>l'infini positif ou négatif</gras> (noté <math>\infty</math> par les mathématiciens). C'est par exemple le résultat de la division d'un nombre non nul par zéro (le signe dépendant alors du signe du numérateur et du zéro en dénominateur) ;</puce><puce><gras><couleur nom="orange">NaN</couleur></gras> (<italique>not a number</italique>, pas un nombre). <gras>NaN est une valeur spéciale qui est utilisée pour signaler une erreur</gras> (<math>0 \div 0</math> ou <math>\sqrt{-1}</math> par exemples). N'importe quel calcul avec un NaN doit renvoyer NaN (sauf quelques exceptions), et n'importe quelle comparaison avec un NaN doit renvoyer faux (sauf <minicode type="c">!=</minicode>) ; un NaN n'est même pas égal à lui-même, c'est pourquoi <minicode type="c">x==x</minicode> peut renvoyer faux ;</puce><puce>enfin, on n'a pas encore réglé le problème de zéro.</puce></liste>
+Quelques calculs avec ces valeurs particulières :
+<secret><math>\begin{matrix}\text{Le symbole}\pm\text{dans le r\'esultat d'une division signifie que le signe} \\ \text{d\'epend de ceux du num\'erateur et du d\'enominateur selon la r\`egle suivante :} \\\text{- deux signes identiques : signe +} \\\text{- deux signes diff\'erents : signe -} \\ \end{matrix}</math>
+
+<math>\begin{matrix} x \div 0 &=& \pm\infty                            \\ 0 \div 0 &=& NaN                                  \\ \\ x \div \infty  &=& \pm0                           \\ \infty \div \infty &=& NaN                        \\ \\ 0 \times \infty &=& NaN                           \\ \\ (+\infty) + (+\infty) &=& +\infty                 \\ (+\infty) - (+\infty) &=& NaN                     \\ \end{matrix}</math></secret>
+
+<attention><position valeur="justifie">Ça ne vous autorise pas à écrire des choses comme <minicode type="c">var / 0</minicode> dans votre programme ! En effet, la division par zéro avec des nombres <souligne>entiers</souligne> a un comportement indéterminé, c'est-à-dire non prévu par la norme du langage C. Ça signifie qu'il peut se passer n'importe quoi lorsque vous faites ceci, selon le bon plaisir de votre compilateur, de votre système d'exploitation… Généralement, cela provoque une erreur fatale et un beau plantage en règle de votre programme.
+D'ailleurs, le comportement de la division par zéro de nombres flottants est également indéterminé. Les règles de calcul ci-dessus ne sont en fait déterminées que par la norme IEEE 754, et non par la norme C elle-même.</position></attention>
+
+Pour représenter tout ce petit monde, on utilise des valeurs spéciales de l'exposant (qui ne peuvent donc pas être utilisées pour des nombres normaux) :
+<liste><puce>Si <souligne>l'exposant vaut sa valeur maximale</souligne> (soit 2<exposant><italique>e</italique></exposant>-1) et que <souligne>la mantisse est nulle</souligne>, alors c'est <gras>l'infini</gras> (positif ou négatif, selon le bit de signe).
+</puce><puce>Si <souligne>l'exposant vaut sa valeur maximale</souligne> (soit 2<exposant><italique>e</italique></exposant>-1) et que <souligne>la mantisse n'est pas nulle</souligne>, alors c'est <gras>NaN</gras>.
+</puce><puce>Si <souligne>l'exposant décalé vaut 0</souligne> et que <souligne>la mantisse est nulle</souligne>, alors c'est <gras>zéro</gras> (positif ou négatif, selon le bit de signe).
+</puce><puce>Si <souligne>l'exposant décalé vaut 0</souligne> et que <souligne>la mantisse n'est pas nulle</souligne>, alors c'est un <gras><couleur nom="orange">nombre <italique>dénormalisé</italique></couleur></gras> : on considère que le bit implicite (la partie entière en notation scientifique) vaut 0.
+</puce><puce><souligne>Dans tous les autres cas</souligne>,  c'est un <gras><couleur nom="orange">nombre <italique>normalisé</italique></couleur></gras> : on considère que le bit implicite vaut 1.
+</puce></liste>
+
+Un petit tableau pour récapituler tout ça de manière visuelle (pour un <minicode type="c">float</minicode> de 32 bits)…
+
+<position valeur="centre"><tableau><legende>Tableau récapitulatif des différents types de valeurs d'un nombre à virgule flottante</legende><ligne><entete fusion_lig="2">Type</entete><entete fusion_col="2">Représentation mémoire</entete><entete fusion_lig="2">Valeur</entete></ligne><ligne><entete>binaire</entete><entete>hexadécimal</entete></ligne><ligne><cellule><gras><italique>Not a Number</italique></gras></cellule><cellule><taille valeur="ttpetit">[0/1]</taille> — 11111111 — 11111111111111111111111
+…
+<taille valeur="ttpetit">[0/1]</taille> — 11111111 — 00000000000000000000001</cellule><cellule><taille valeur="ttpetit">[7/F]</taille>F FF FF FF
+…
+<taille valeur="ttpetit">[7/F]</taille>F 80 00 01</cellule><cellule>NaN
+…
+NaN</cellule></ligne><ligne><cellule><gras>Infini</gras></cellule><cellule><taille valeur="ttpetit">[0/1]</taille> — 11111111 — 00000000000000000000000</cellule><cellule><taille valeur="ttpetit">[7/F]</taille>F 80 00 00</cellule><cellule>± <math>\infty</math></cellule></ligne><ligne><cellule><gras>Nombre normalisé</gras></cellule><cellule><taille valeur="ttpetit">[0/1]</taille> — 11111110 — 11111111111111111111111
+…
+<taille valeur="ttpetit">[0/1]</taille> — 00000001 — 00000000000000000000000</cellule><cellule><taille valeur="ttpetit">[7/F]</taille>F 7F FF FF
+…
+<taille valeur="ttpetit">[0/8]</taille>0 80 00 00</cellule><cellule>± 3,4028235 ×10<exposant>+38</exposant>
+…
+± 1,1754944 ×10<exposant>-38</exposant></cellule></ligne><ligne><cellule><gras>Nombre dénormalisé</gras></cellule><cellule><taille valeur="ttpetit">[0/1]</taille> — 00000000 — 11111111111111111111111
+…
+<taille valeur="ttpetit">[0/1]</taille> — 00000000 — 00000000000000000000001</cellule><cellule><taille valeur="ttpetit">[0/8]</taille>0 7F FF FF
+…
+<taille valeur="ttpetit">[0/8]</taille>0 00 00 01</cellule><cellule>± 1,1754942 ×10<exposant>-38</exposant>
+…
+± 1,4012985 ×10<exposant>-45</exposant></cellule></ligne><ligne><cellule><gras>Zéro</gras></cellule><cellule><taille valeur="ttpetit">[0/1]</taille> — 00000000 — 00000000000000000000000</cellule><cellule><taille valeur="ttpetit">[0/8]</taille>0 00 00 00</cellule><cellule>± 0</cellule></ligne></tableau></position>
+À titre informatif, je vous mets aussi le tableau équivalent pour un <minicode type="c">double</minicode> de 64 bits (sans le binaire, ça prend trop de place).
+
+<position valeur="centre"><tableau><legende>idem pour un double</legende><ligne><entete>Type</entete><entete>Représentation mémoire</entete><entete>Valeur</entete></ligne><ligne><cellule><gras><italique>Not a Number</italique></gras></cellule><cellule><taille valeur="ttpetit">[7/F]</taille>F FF FF FF   FF FF FF FF
+…
+<taille valeur="ttpetit">[7/F]</taille>F F0 00 00   00 00 00 01</cellule><cellule>NaN
+…
+NaN</cellule></ligne><ligne><cellule><gras>Infini</gras></cellule><cellule><taille valeur="ttpetit">[7/F]</taille>F F0 00 00   00 00 00 00</cellule><cellule>± <math>\infty</math></cellule></ligne><ligne><cellule><gras>Nombre normalisé</gras></cellule><cellule><taille valeur="ttpetit">[7/F]</taille>F EF FF FF   FF FF FF FF
+…
+<taille valeur="ttpetit">[0/8]</taille>0 10 00 00   00 00 00 00</cellule><cellule>± 1,7976931348623157 ×10<exposant>+308</exposant>
+…
+± 2,2250738585072014 ×10<exposant>-308</exposant></cellule></ligne><ligne><cellule><gras>Nombre dénormalisé</gras></cellule><cellule><taille valeur="ttpetit">[0/8]</taille>0 0F FF FF   FF FF FF FF
+…
+<taille valeur="ttpetit">[0/8]</taille>0 00 00 00   00 00 00 01</cellule><cellule>± 2,2250738585072010 ×10<exposant>-308</exposant>
+…
+± 5,0000000000000000 ×10<exposant>-324</exposant></cellule></ligne><ligne><cellule><gras>Zéro</gras></cellule><cellule><taille valeur="ttpetit">[0/8]</taille>0 00 00 00   00 00 00 00</cellule><cellule>± 0</cellule></ligne></tableau></position>
+Notez que pour passer d'un nombre positif à son équivalent négatif, il suffit d'additionner <taille valeur="tpetit">0x</taille> 8000 0000 à sa représentation (ou <taille valeur="tpetit">0x</taille> 8000 0000 0000 0000 s'il s'agit d'un <minicode type="c">double</minicode>). Ceci nous servira plus tard. ;) 
+
+
+Courage, cette partie théorique n'est pas encore finie, et peut-être que vous trouvez ça barbant, mais après on fera quelque chose de plus pratique.
+
+
+<titre1>Nombres dénormalisés</titre1>
+
+Nous allons maintenant nous attarder sur les nombres dénormalisés. C'est qu'ils sont traîtres, les bougres.
+
+<gras>Un nombre dénormalisé est un nombre si petit (en valeur absolue) que l'on ne peut pas le représenter en mémoire en se basant sur son écriture scientifique.</gras> Par exemple, <taille valeur="tpetit">0b</taille> 1011 ×2<exposant>-133</exposant> (soit environ 1,0101905 ×10<exposant>-39</exposant>) a pour écriture scientifique <taille valeur="tpetit">0b</taille> 1,011 ×2<exposant>-130</exposant> ; cependant, on ne peut pas stocker l'exposant -130 dans un <minicode type="c">float</minicode>.
+
+<gras>On ruse donc en écrivant le nombre avec le plus petit exposant possible.</gras> <italique><couleur nom="marine">Question :</couleur></italique> quel est cet exposant (pour un <minicode type="c">float</minicode>) ?
+Si vous avez répondu -127 (et je suis sûr que vous l'avez fait, si vous suivez encore ce cours), vous êtes tombés dans le piège. Mouahaha. :p 
+
+<question><position valeur="justifie">Mais pourtant, c'est bien l'exposant non-décalé minimal, celui qui sert pour représenter des nombres dénormalisés ?</position></question>
+Tout à fait. En fait, les gens de chez IEEE (qui sont très très intelligents, si si) ont décidés de compliquer la chose. Ils ont choisi que, bien que l'exposant non-décalé en mémoire soit -127 (pour un <minicode type="c">float</minicode>), <gras>l'exposant "réel" d'un nombre dénormalisé serait -126</gras>, c'est-à-dire le même que pour les plus petits nombres normalisés !
+
+Pourquoi cela ? Pour assurer une sorte de continuité avec les premiers nombres normalisés. Puisqu'ils ont le même exposant "réel", les nombres dénormalisés et les premiers nombres normalisés sont à intervalles réguliers :
+
+<citation nom="liste des nombres dénormalisés et premiers nombres normalisés (pour un float)"><taille valeur="tpetit">0b</taille> 0,00000000000000000000000 ×2<exposant>-126</exposant>   // <gras>zéro</gras>
+<taille valeur="tpetit">0b</taille> 0,00000000000000000000001 ×2<exposant>-126</exposant>   // 1er nombre <gras>dénormalisé</gras>
+<taille valeur="tpetit">0b</taille> 0,00000000000000000000010 ×2<exposant>-126</exposant>   //    nombre dénormalisé suivant
+…
+<taille valeur="tpetit">0b</taille> 0,11111111111111111111110 ×2<exposant>-126</exposant>   // avant-dernier nombre dénormalisé
+<taille valeur="tpetit">0b</taille> 0,11111111111111111111111 ×2<exposant>-126</exposant>   // dernier nombre dénormalisé
+<taille valeur="tpetit">0b</taille> 1,00000000000000000000000 ×2<exposant>-126</exposant>   // 1er nombre <gras>normalisé</gras>
+<taille valeur="tpetit">0b</taille> 1,00000000000000000000001 ×2<exposant>-126</exposant>   //    nombre normalisé suivant
+…
+<taille valeur="tpetit">0b</taille> 1,11111111111111111111110 ×2<exposant>-126</exposant>   // avant-dernier nombre normalisé de cet exposant
+<taille valeur="tpetit">0b</taille> 1,11111111111111111111111 ×2<exposant>-126</exposant>   // dernier nombre normalisé de cet exposant
+</citation>
+Nous reparlerons des intervalles dans la partie suivante.
+
+
+Revenons à nos moutons. Comme je le disais, on écrit donc le nombre avec le plus petit exposant possible, soit ici <taille valeur="tpetit">0b</taille> <couleur nom="rouge">+</couleur> 0,<couleur nom="bleu">0001011</couleur> ×2<exposant><couleur nom="vertf">-126</couleur></exposant>.
+On traduit ensuite ceci de façon similaire à ce qu'on a fait pour un nombre normalisé : suivez les couleurs !
+
+<position valeur="centre"><image legende="schéma : de l'écriture décimale à la représentation en mémoire d'un nombre flottant dénormalisé">http://uploads.siteduzero.com/files/323001_324000/323151.png</image></position>
+
+
+Vous comprenez maintenant pourquoi le bit implicite est à 0 pour un nombre dénormalisé ?
+
+
+Pour un <minicode type="c">double</minicode>, l'exposant sera -1022 ; de manière générale, il s'agit de <math>1 - d\'ecalage</math>.
+
+
+<question><position valeur="justifie">Mais pourquoi avoir inventé les nombres dénormalisés ? o_O Il aurait été plus simple de décider qu'à l'exposant décalé nul correspondaient également des nombres normalisés "banals" (dont l'exposant réel serait bien -127 et non -126).</position></question>
+C'est vrai, on peut cependant trouver plusieurs raisons :<liste><puce>Historiquement, l'exposant minimal servait pour représenter zéro, quelle que soit la valeur de la mantisse ; les nombres dénormalisés ont été introduits en 1985 avec la première version de la norme IEEE 754.</puce><puce>D'ailleurs, si l'on avait choisi des nombres normalisés pour "remplir" cet exposant, la représentation de zéro n'aurait plus été cohérente. En effet, on se serait retrouvé avec ±<italique>zéro</italique> = ± 1,00000000000000000000000 ×2<exposant>-127</exposant> (le bit implicite valant 1).
+Cela dit, les nombres dénormalisés introduisent eux-même une incohérence, puisqu'il y a deux types de nombres qu'il faut interpréter différemment ; de plus, on aurait été tout à fait capable de gérer cette incohérence pour interpréter correctement zéro.</puce><puce>Les nombres dénormalisés permettent de représenter des nombres bien plus petits (plus proches de zéro) que si l'on avait choisi des nombres normalisés. En effet, le plus petit nombre dénormalisé est ± <taille valeur="tpetit">0b</taille> 0,00000000000000000000001 ×2<exposant>-126</exposant>, soit ±1 ×2<exposant>-149</exposant> (-126-23 = -149) ; si l'on avait choisi des nombres normalisés, le plus petit aurait été ± <taille valeur="tpetit">0b</taille> 1,00000000000000000000001 ×2<exposant>-127</exposant>.</puce></liste>
+Cependant, un reproche qu'on pourrait faire aux nombres dénormalisés est qu'en plus de tout compliquer pour nous autres pauvres humains, ils perdent en précision au fur et à mesure qu'ils se rapprochent de zéro (c'est ce que nous allons voir dans la partie suivante).
+
+</position>]]>
+	</texte>
+      </souspartie>
+    
+      <souspartie id="497478">
+	<titre>
+	  <![CDATA[Autour de la représentation en mémoire : un peu de mathématiques…]]>
+	</titre>
+	<texte>
+	  <![CDATA[<position valeur="justifie">Dans cette partie, nous allons continuer à approfondir les aspects théoriques. Elle va se révéler très mathématique. >_< 
+
+
+<titre1>Retrouver la valeur du nombre flottant</titre1>
+
+Non, restez ! Bon, si vraiment le mot <italique>mathématiques</italique> vous fait pousser des boutons, vous pouvez passer cette partie, mais elle est intéressante pour bien comprendre la conversion de la représentation en mémoire vers la valeur.
+
+
+<information><position valeur="justifie">Pour la suite, vous devrez être à l'aise avec les bases numériques, et en particulier le binaire. Je ne détaillerais pas, donc si vous ne maîtrisez pas vous n'allez pas comprendre d'où sortent les expressions, et autant passer cette partie. De toute façon, ces formules ne sont certainement pas à apprendre par cœur : elles sont là à titre informatif et vous devriez être capable de les retrouver.</position></information>
+
+Pour la suite, on note :<liste><puce><math>flottant</math> la valeur du flottant représenté ;</puce><puce><math>m</math> et <math>e</math> le nombre de bits occupés par la mantisse et l'exposant (respectivement) ;</puce><puce><math>mantisse</math> la mantisse (plus précisément, sa représentation entière) ;</puce><puce><math>exposant</math> l'exposant <souligne>non-décalé</souligne> (en termes de puissances de 2) ; le décalage de l'exposant est <math>d\'ecalage=  2^{e-1}-1</math>, on en déduit les valeurs limites de l'exposant :<liste><puce>la valeur minimale de l'exposant non-décalé, réservée aux zéros et nombres dénormalisés, est <math>exposantMin=\quad  0 - d\'ecalage  \quad=  1 - 2^{e-1}</math> (mais l'exposant "<souligne>réel</souligne>" des dénormalisés est <math>exposantMin+1</math>) ;</puce>   <puce>la valeur maximale de l'exposant non-décalé, réservée aux infinis et NaNs, est <math>exposantMax=\quad  (2^e-1) - d\'ecalage  \quad=  2^{e-1}</math>.</puce></liste></puce></liste>
+
+
+Pour retrouver la partie significative de la notation scientifique, il suffit de faire <math>1+\frac{mantisse}{2^m}</math> si le nombre est normalisé, ou <math>0+\frac{mantisse}{2^m}</math> s'il est dénormalisé.<liste><puce>1 ou 0 représente la partie entière du flottant (c'est-à-dire le bit implicite).</puce><puce>La fraction qui suit représente la partie décimale (on a <math>0\le\frac{mantisse}{2^m}<1</math> ).</puce></liste>
+
+Ensuite, il suffit de multiplier par la puissance de 2 indiquée par l'exposant réel, et d'adapter le signe selon le bit de signe :<liste><puce><math>flottant=\quad  \pm\enspace (1+\frac{mantisse}{2^m})\times2^{exposant}</math>	(normalisé) ;</puce><puce><math>flottant=\quad  \pm\enspace (0+\frac{mantisse}{2^m})\times2^{exposantMin+1}</math>	(dénormalisé).</puce></liste>
+
+
+Si l'on reprend les exemples de tout à l'heure…
+
+
+<titre2>Exemple 1 : Nombre normalisé</titre2>
+<position valeur="centre"><image legende="schéma : de la représentation en mémoire à l'écriture décimale d'un nombre flottant normalisé">http://uploads.siteduzero.com/files/322001_323000/322947.png</image></position>
+
+<math>\[\begin{aligned}flottant  &=\quad  -\enspace (1 + \frac{\textit{0b}\thinspace 10001000101100000000000}{2^{23}}) \times2^{11}\\        &=\quad  -\enspace (1 + \frac{4,478976\times10^6}{2^{23}}) \times2^{11}  \quad\quad=\enspace  -3141{,}5\end{aligned}\]</math>
+On retrouve bien -3141,5. :)
+
+
+<titre2>Exemple 2 : Nombre dénormalisé</titre2>
+<position valeur="centre"><image legende="schéma : de la représentation en mémoire à l'écriture décimale d'un nombre flottant dénormalisé">http://uploads.siteduzero.com/files/323001_324000/323193.png</image></position>
+
+<math>\[\begin{aligned}flottant  &=\quad  +\enspace (0 + \frac{\textit{0b}\thinspace 00010110000000000000000}{2^{23}}) \times2^{-127+1}\\        &=\quad  +\enspace (0 + \frac{720896}{2^{23}}) \times2^{-126}  \quad\quad\approx\enspace  +\enspace 1{,}0101905\times10^{-39}\end{aligned}\]</math>
+Là aussi, on retrouve bien le nombre de départ.
+
+
+<titre1>Intervalle entre les nombres en fonction de l'exposant</titre1>
+
+Selon la norme IEEE 754, les nombres consécutifs de même exposant (qu'ils soient normalisés ou pas) sont "placés" à <gras>intervalle régulier</gras>. En effet, pour passer d'un nombre au nombre suivant, on ajoute toujours <math>\delta=\quad 0.00000000000000000000001 \times2^{exposant} \enspace= \frac{1}{2^m} \times2^{exposant} \enspace= 2^{exposant-m}</math>.
+
+
+Cet intervalle double quand on passe d'un exposant à l'exposant supérieur (logique, d'après la formule). Quelques valeurs remarquables pour un <minicode type="c">float</minicode> (ne les apprenez pas !) :<liste><puce>2<exposant>-126 - 23</exposant> = 2<exposant>-149</exposant> ≈ 1,40 ×10<exposant>-45</exposant> : écart entre les nombres dénormalisés et les premiers nombres normalisés (et valeur du tout premier nombre dénormalisé) ;</puce><puce>2<exposant>0 - 23</exposant> ≈ 1,19 ×10<exposant>-7</exposant> : écart entre les nombres normalisés compris entre 1 et 2 ;</puce><puce>1 : écart entre les nombres normalisés d'exposant non-décalé 23 ;</puce><puce>2<exposant>127 - 23</exposant> ≈ 2,03 ×10<exposant>31</exposant> : écart entre les plus grands nombres normalisés.</puce></liste>
+
+L'écart séparant le dernier nombre d'un exposant donné du premier nombre de l'exposant suivant est le même que celui séparant les nombres de l'exposant donné (c'est encore logique, si vous réfléchissez).
+
+
+<titre1>Précision et chiffres significatifs</titre1>
+
+Vous aurez remarqué une colonne "chiffres significatifs" dans le premier tableau. Vous-êtes vous demandé ce que cela signifiait ? C'est ce dont on va parler ici.
+
+
+Mais qu'est-ce qu'un <gras><couleur nom="orange">chiffre significatif</couleur></gras> ? Le nombre de chiffres significatifs d'un nombre, c'est tout simplement le nombre de chiffres utilisés pour écrire ce nombre (dans une base numérique donnée). Par exemple, 43,1337 a 6 chiffres significatifs.
+
+En physique et en chimie, on y voue une attention particulière. En effet, les mesures n'étant jamais exactes, on s'en sert pour <gras>indiquer le degré de <italique>précision</italique></gras> de la mesure (qui varie selon les instruments). En conséquence, pour un physicien, 42,1337 est différent de 42,13370 ; le second nombre est plus précis, car il indique quel est le 5è chiffre après la virgule tandis que le premier nombre s'arrête au 4è (le 5è chiffre pourrait être 0, 1, 2, 3, 4, mais pas 5 ou plus car sinon on aurait arrondi au supérieur et le 4è chiffre serait 8).
+
+On compte les chiffres significatifs à partir du premier chiffre de gauche différent de 0, ce qui signifie que 3,1416 et 003,1416 sont équivalents (ils ont tous deux 5 chiffres significatifs).
+
+
+Vous pouvez maintenant comprendre la colonne du tableau : elle indique le nombre de chiffres significatifs en base 10 que nous permet chaque format :<liste><puce>le format 32 bits garantit <gras>7</gras> chiffres significatifs en base 10 ;</puce><puce>le format 64 bits garantit <gras>16</gras> chiffres significatifs en base 10.</puce></liste>
+
+Maintenant, <italique><couleur nom="marine">contrôle surprise :</couleur></italique> combien de chiffres significatifs en base 2 permettent ces formats ? :diable: Mais si, vous pouvez tout à fait répondre, réfléchissez un peu.
+C'est tout simple : la mantisse représentant la partie significative du nombre, un nombre flottant a autant de chiffres significatifs en base 2 que sa mantisse occupe de bits.
+Hmm hmm. Vous êtes certain ? N'oubliez pas le bit implicite ! Il faut donc ajouter 1 à ce nombre. En vérité, <gras>un nombre normalisé a donc <math>m+1</math> chiffres significatifs en binaire</gras>, soit 23+1=24 pour le format 32 bits, ou 52+1=53 pour le format 64 bits.
+On appelle souvent le nombre de chiffres significatifs en base 2 la <gras><couleur nom="orange">précision</couleur></gras> tout court.
+
+
+Mais ce n'est pas aussi simple ! Cette "formule" pour la précision n'est valable que pour les nombre normalisés. Voyez-vous pourquoi ?
+Rappelez-vous que pour les nombres dénormalisés, le bit implicite, c'est-à-dire la partie entière du nombre, est 0. Comme c'est le premier chiffre, on ne le compte pas dans les chiffres significatifs.
+
+<question>Ah bah alors, pour un nombre dénormalisé, la précision c'est juste le nombre de bits de la mantisse ?</question>
+Que nenni, jeune padawan. Un court schéma vaut mieux que de longues explications.
+
+<position valeur="centre"><image legende="schéma : précision (nombre de chiffres significatifs en base 2) d'un nombre flottant normalisé ou non">http://uploads.siteduzero.com/files/323001_324000/323005.png</image></position>
+
+Comme vous le voyez, <gras>plus un nombre dénormalisé est proche de zéro, moins il est précis</gras>.
+
+</position>]]>
+	</texte>
+      </souspartie>
+    
+      <souspartie id="495065">
+	<titre>
+	  <![CDATA[IEEE 754 : Exceptions & arrondis]]>
+	</titre>
+	<texte>
+	  <![CDATA[<position valeur="justifie">Bien. On vient de se farcir deux chapitres de théorie pure sur la représentation en mémoire d'un nombre à virgule flottante. Vous en avez marre ? Tant mieux, on change de sujet ! Bon, ça va rester théorique, mais un peu moins quand même.
+La norme IEEE 754 ne se limite pas à la représentation des flottants ; elle définit également des exceptions et des modes d'arrondis. Décortiquons tout ça.
+
+
+<titre1>Les exceptions</titre1>
+
+<citation nom="Zér0 impatient (et avec une bonne mémoire)">Ah, on va enfin savoir ce que c'est que les "exceptions" dont tu nous as parlé !</citation>Oui oui, on va voir ça tout de suite. ^^
+
+Une <gras><couleur nom="orange">exception</couleur></gras> est une sorte de "signal" qui est envoyé dans certains cas, afin de traiter <barre>les erreurs</barre> les cas particuliers qui, s'ils étaient ignorés, seraient des erreurs. Cette définition est en fait générale (le terme vous est peut-être familier si vous faites du C++).
+
+
+C'est encore flou pour vous ? Ça ne fait rien, vous allez mieux comprendre avec cette liste.
+IEEE définit cinq exceptions :<liste><puce><gras><italique>invalid operation</italique> (opération invalide)</gras> : se produit lorsqu'une opération interdite est effectuée ; le résultat du calcul en question sera NaN ;</puce><puce><gras><italique>division by zero</italique> (division par zéro)</gras> : se produit lorsqu'on tente de diviser un nombre (non nul) par zéro ; le résultat sera ± <math>\infty</math> ;</puce><puce><gras><italique>overflow</italique></gras> : se produit lorsque le résultat d'un calcul est trop grand (en valeur absolue) pour être stocké ; on arrondit à ± <math>\infty</math> ;</puce><puce><gras><italique>underflow</italique></gras> : se produit lorsque le résultat d'un calcul est trop petit (en valeur absolue) pour être stocké ; on arrondit à zéro ;</puce><puce><gras><italique>inexact</italique></gras> : se produit lorsqu'on effectue un autre arrondi pour pouvoir stocker un nombre flottant (parce que le résultat a plus de chiffres significatifs qu'on peut en stocker).</puce></liste>
+Et là, j'ai une transition de malââââde !…
+
+
+<titre1>Les arrondis</titre1>
+
+<citation nom="Naïf que vous êtes…">C'est super-chouette, c'est merveilleux, je peux manipuler des nombres à virgule en C avec une précision extrême !</citation>
+Oui, <gras><souligne>MAIS</souligne></gras> :
+Les nombres stockés en mémoire ayant un nombre fini de chiffres significatifs (essayez de stocker un nombre infini de chiffres…), <gras>les calculs peuvent mener à des arrondis</gras>. IEEE 754 définit quatre <gras><couleur nom="orange">modes d'arrondis</couleur></gras> :<liste><puce><gras>au nombre le plus proche</gras> : c'est le comportement par défaut (si le nombre à arrondir tombe pile-poile entre deux, alors on arrondit à celui dont le dernier bit vaut 0) ;</puce><puce><gras>vers zéro</gras> ;</puce><puce><gras>vers +<math>\infty</math></gras> ;</puce><puce><gras>vers -<math>\infty</math></gras>.</puce></liste>
+
+C'est là que ça devient intéressant <taille valeur="ttpetit">(enfin ça l'était déjà avant, c'est une façon de parler, n'est-ce-pas)</taille>. Les imprécisions s'accumulent au fil des calculs, et au final vous pouvez obtenir quelque chose d'incohérent !
+
+Ces imprécisions se manifestent par exemple lorsqu'on manipule deux nombres dont les exposants sont très éloignés. Par exemple, <minicode type="c">4.2e17 + 13.37</minicode> devrait donner <minicode type="c">42000000000000001337</minicode> soit <minicode type="c">4.2000000000000001337e17</minicode>, mais il y a plus de chiffres significatifs qu'on ne peut en stocker ; le nombre sera donc arrondi, et finalement il vaudra <minicode type="c">4.2e17</minicode> comme si l'opération n'avait pas eu lieu !
+Certains opérateurs entraînent beaucoup d'arrondis, comme l'addition ou la soustraction. Au contraire, d'autres, tels la multiplication ou la division, sont beaucoup plus sûrs.
+L'exemple précédent devrait vous aider à comprendre pourquoi. ;) 
+
+Autre source de problèmes : comme vu précédemment, tous les nombres décimaux ne sont pas représentables de façon finie en binaire, et certains (comme <minicode type="c">1.0/10.0</minicode> = <minicode type="c">.1</minicode>) sont donc arrondis.
+
+Enfin, et en conséquence de ce qui vient d'être dit :
+<citation rid="6407083">Les opérations avec les flottants ne sont pas associatives : l'ordre dans lequel on fait un calcul change le résultat. Par exemple, <minicode type="c">1 - (.2 + .2 + .2 + .2 + .2)</minicode> aura un résultat différent de <minicode type="c">(((((1-.2)-.2)-.2)-.2)-.2)</minicode>.</citation>Pas convaincus ? Vérifions ça !<code type="c">#include <stdio.h>int main(void) {   printf("%g\n%g\n",  (1.0 - .2 - .2 - .2 - .2 - .2),                       (1.0 - (.2 + .2 + .2 + .2 + .2))  );   return 0;}</code>Compilé chez moi, j'obtiens ceci :<code type="console">5.55112e-0170</code>Ça parle tout seul.
+
+
+<titre2>Remarque hors-sujet (mais importante)</titre2>
+De façon plus générale, il faut rester vigilant lorsqu'on écrit des expressions impliquant des flottants, car des expressions <italique>a priori</italique> équivalentes, du point de vue d'un humain, se révèlent en fait différentes en pratique. >_< L'exemple précédent l'illustre bien. D'autres cas parlants sont imaginables.<liste>	<puce>Il y a pas mal de cas où ce qui change d'une expression à l'autre est le signe du zéro obtenu. Par exemple, <minicode type="c">x-y</minicode> et <minicode type="c">-(y-x)</minicode> ne sont pas équivalents car si les deux nombres sont égaux, alors la première expression donne <minicode type="c">+0.0</minicode> mais la deuxième <minicode type="c">-0.0</minicode>.</puce>	<puce>Il y a aussi des cas où les expressions ne sont pas équivalentes si on considère les valeurs "spéciales" des nombres, à savoir zéro, l'infini ou NaN :<liste><puce><minicode type="c">x-x</minicode> ne vaut pas <minicode type="c">0.0</minicode> si <minicode type="c">x</minicode> vaut l'infini ou NaN ;</puce><puce><minicode type="c">0*x</minicode> ne vaut pas <minicode type="c">0.0</minicode> si <minicode type="c">x</minicode> vaut <minicode type="c">-0.0</minicode>, l'infini ou NaN ;</puce><puce><minicode type="c">x/x</minicode> ne vaut pas <minicode type="c">1.0</minicode> si <minicode type="c">x</minicode> vaut zéro, l'infini ou NaN ;</puce><puce><minicode type="c">x==x</minicode> est faux si <minicode type="c">x</minicode> vaut NaN ; :euh: </puce><puce><minicode type="c">x!=x</minicode> est vrai si <minicode type="c">x</minicode> vaut NaN.</puce></liste></puce></liste>Cette liste est tirée de la norme C99 (ISO/IEC 9899:TC3), que je vous invite à consulter si vous en voulez une plus complète (localisation dans le <lien url="http://open-std.org/JTC1/SC22/WG14/www/docs/n1256.pdf">draft PDF</lien> de la norme : <italique>Annex F — F.8.2 Expression transformations & F.8.3 Relational operators (p. 464-466)</italique>).
+
+
+<titre1>L'environnement des flottants : <minicode type="c"><fenv.h></minicode></titre1>
+
+Cet ensemble de paramètres (les exceptions et le mode d'arrondi) forme ce qu'on appelle en informatique (c'est une définition générale) un <gras>environnement</gras>. C'est le cadre dans lequel on travaille.
+
+Cet environnement pour les flottants est accessible avec le header standard (C99) <minicode type="c"><fenv.h></minicode>. Il permet de manipuler les exceptions (les surveiller, en lever, etc.) et les modes d'arrondis (savoir quel est le mode utilisé et en changer). Je ne détaillerais cependant pas son utilisation dans ce tutoriel déjà bien assez long. Si vous voulez en savoir plus, consultez (par exemple) <lien type="wikipedia" url="Fenv.h" langue="en">cette page Wikipédia</lien> ou <lien url="http://pubs.opengroup.org/onlinepubs/009604599/basedefs/fenv.h.html">cette page du site d'Open Group</lien>.
+
+</position>]]>
+	</texte>
+      </souspartie>
+    
+      <souspartie id="495079">
+	<titre>
+	  <![CDATA[Comparer des nombres flottants]]>
+	</titre>
+	<texte>
+	  <![CDATA[<position valeur="justifie"><titre1>L'infâme traîtrise de l'opérateur <minicode type="c">==</minicode></titre1>
+
+Bon. On a donc vu que l'utilisation des flottants en C est semée d'embûches : on risque des arrondis et des expressions "normalement" équivalentes ne le sont pas.
+Mais ce n'est pas tout ! Les comparaisons vont aussi vous donner du fil à retordre. :( En effet, <gras>l'opérateur de comparaison <minicode type="c">==</minicode> renvoie vrai si ses deux opérandes sont EXACTEMENT égales</gras>, ou s'il compare un zéro positif et un zéro négatif. Or, avec les problèmes d'arrondis, ce n'est pas forcément vrai, car une différence minuscule peut s'être glissée entre les deux nombres testés. Ainsi, vous risquez de vous retrouver avec des égalités qui devraient être vraies mais qui sont fausses, ou le contraire !
+
+Cela peut faire planter lamentablement un programme (boucles infinies, instructions dans un bloc conditionnel jamais exécutées…) avec un problème dont la source est difficilement identifiable si l'on est pas averti.
+
+
+Un petit exemple ?
+
+<minicode type="c">4.2e17  ==  4.2e17 + 13.37</minicode> renverra vrai (d'après l'exemple précédent) !
+
+Autre exemple :
+<code type="c">int main(void) {   float f=0;   int i;      for(i=0; i<100; ++i)      f+= .01;      if(f==1)   printf("f==1\n");   else       printf("f!=1,  f==%f", f);      return 0;}</code>
+La sortie sera : <minicode type="console">f!=1,  f==0.999999</minicode>.
+
+Évidemment, ces exemples sont stupides, mais ils permettent de mieux saisir dans quels cas se pose ce problème.
+
+
+Les utilisateurs de GCC seront intéressés de savoir qu'il existe une option <minicode type="console">-Wfloat-equal</minicode> qui déclenche un <italique>warning</italique> dès que l'on utilise l'opérateur <minicode type="c">==</minicode> sur des nombres flottants.
+
+
+<citation nom="Vous voilà déniaisés">Argghh…! mais c'est abominable !</citation>
+Eh oui, c'est horrible. Il est encore temps d'abandonner définitivement l'informatique et d'apprendre le patchwork.
+
+Non attendez, revenez ! Bien sûr, il existe des astuces ! Et heureusement !
+
+
+<information><position valeur="justifie">La suite est fortement inspirée de <lien url="http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm">cette page Internet</lien> (en anglais). Elle est complète et détaillée et je vous invite à la lire, car je n'aborderai pas forcément tout ce qu'elle dit (mais y ajouterai quelques broutilles de mon cru).</position></information>
+
+Alors, récapitulons : on cherche à comparer deux nombres à virgule flottante (<minicode type="c">float</minicode> ou <minicode type="c">double</minicode>) en tenant compte d'une marge d'erreur due aux arrondis ; on va pour cela écrire une fonction qui renverra un booléen (vrai ou faux, 1 ou 0), pour remplacer l'opérateur <minicode type="c">==</minicode>.
+
+
+<titre1>L'écart absolu & l'écart relatif</titre1>
+
+La première méthode consiste tout simplement à mesurer l'écart entre les deux nombres. On parle d'<gras>écart absolu</gras> (par opposition à l'écart relatif que nous verrons par la suite). Si cet écart est inférieur à une certaine valeur (souvent appelée <italique>epsilon</italique>, ce qui pour un mathématicien signifie « valeur très petite »), alors on considère que les deux nombres sont égaux.
+
+<code type="c">#include <math.h>   // pour la fonction fabs, renvoyant la valeur absolue d'un flottant#define  EPSILON  1e-8/* ici pour des doubles, mais on fait la même chose pour des floats */int doublesAreEqual(double a, double b) {   return fabs(a-b) <= EPSILON;/* La fonction fabs renvoie la valeur absolue (c'est-à-dire positive) du nombre   de type double passé en argument ; ses équivalents (C99) sont fabsf pour les   float, et fabsl pour les long double (pensez donc à adapter votre code en   conséquence pour comparer les autres types flottants). */}</code>
+Ici, <minicode type="c">fabs</minicode> nous renvoie l'écart absolu entre a et b. Le reste est facile à comprendre. Simple, non ?
+
+
+Oui, mais c'est encore loin d'être parfait : en effet, un écart de <minicode type="c">1e-8</minicode> (soit <minicode type="c">0.00000001</minicode>) peut s'avérer judicieux pour comparer des nombres compris entre 0.1 et 1 (par exemple, en fonction de la précision que vous souhaitez), mais trop petit pour des nombres entre 10 et 100, ou trop grand pour des nombres entre 0.00001 et 0.0001 ; si vous comparez des nombres compris entre 0.00000001 et 0.0000001, vous avez même une marge d'erreur de 100% !
+N'employez donc cette méthode que si vous êtes sûr de l'ordre de grandeur des nombres à comparer, et choisissez un <italique>epsilon</italique> adapté.
+
+Pour pallier à ce problème et faire une fonction plus générique, une solution serait de passer l'écart maximal en argument à la fonction et non de se baser sur une constante de préprocesseur ; ainsi, l'utilisateur pourrait fournir un écart adapté à l'ordre de grandeur des nombres qu'il veut comparer.
+Allons plus loin. On va employer l'<gras>écart relatif</gras>. Celui-ci ramène l'écart absolu dans les proportions des nombres comparés :
+
+<code type="c">#include <math.h>#define  EPSILON  1e-8int doublesAreEqual(double a, double b) {   if(a==b)   return 1;   // si a et b valent zéro  (explications plus bas)      double absError= fabs(a-b);   // écart absolu   a= fabs(a);   // on ne garde que les valeurs absolues pour la suite …   b= fabs(b);   // … pour pouvoir calculer le nombre le plus grand en valeur absolue      return  ( absError / (a>b? a:b) )  <=  EPSILON;}</code>
+On divise l'écart absolu par le plus grand des deux nombres en valeur absolue (signification du ternaire), pour avoir quelque chose d'adapté à l'ordre de grandeur des deux nombres.
+
+La ligne commençant par <minicode type="c">if(a==b)</minicode> vous paraît sans doute bizarre. Elle est là pour gérer le cas où a et b sont égaux à zéro. En effet, sans elle, on aurait une division par zéro qui vaudrait NaN, et la comparaison serait donc toujours fausse. On compare donc les deux nombres pour que la fonction renvoie vrai s'ils sont identiques et égaux à zéro (positif ou négatif).
+
+<information><position valeur="justifie"><italique>Remarque :</italique> Dans ce tutoriel, j'utilise le C99, et non le C90 enseigné dans le cours de M@teo21. Celui-ci autorise de déclarer des variables après des instructions. Si c'était juste pour ce détail, ce serait superflu, mais plus loin on en aura réellement besoin.</position></information>
+
+Cependant, il subsiste un problème : dans le cas de deux nombres très proches de zéro, l'écart relatif sera très important (car on divise par un tout petit nombre) alors que ces deux nombres seront très proches… Pour y remédier, on réintroduit l'écart absolu : la fonction retournerait vrai si l'écart absolu OU l'écart relatif (au moins l'un des deux) est inférieur à une valeur donnée (qu'on passe en argument à la fonction). D'où le code définitif :
+
+<code type="c">#include <math.h>#define  EPSILON  1e-8int doublesAreEqual(double a, double b, double maxAbs, double maxRel) {   if(a==b)   return 1;      double absError= fabs(a-b);   a= fabs(a);   b= fabs(b);      return   absError <= maxAbs   ||   ( absError / (a>b? a:b) )  <=  maxRel;}</code>
+
+<titre1>La représentation en mémoire convertie en entier</titre1>
+
+Maintenant, vous avez du code à peu près potable et fonctionnel. Toutefois, il existe une autre manière de faire, plus pratique mais un peu plus <italique>hard</italique>. Accrochez-vous, ça va secouer. :pirate:
+
+
+Imaginez qu'au lieu de se baser sur l'écart entre les deux nombres, on cherche à déterminer combien de nombres possibles les séparent ? Ainsi, on aimerait placer une marge d'erreur, non sur la valeur elle-même des nombres flottants, mais sur leur "éloignement", pour pouvoir dire par exemple : « <italique>J'accepte les 5 nombres en dessous et les 5 nombres au dessus de la valeur machin</italique> ».
+
+Eh bien, grâce au format de l'IEEE, c'est possible !
+
+<attention><position valeur="justifie">Ici, on a donc impérativement besoin du format IEEE 754 ! L'astuce présentée est basée dessus. Si jamais ce n'est pas ce format que vous avez chez vous, vous ne pourrez sans doute pas la mettre en œuvre.
+Toutefois, je vous invite à lire quand même ce qui suit, cela pourra peut-être vous intéresser <barre>(et vous convaincre de changer d'ordinateur)</barre> ; et en tous cas, lisez la dernière sous-partie (intitulée "Code complet"), car bien que je me base sur cette astuce, je vous présente des idées qui pourront vous intéresser même si vous utilisez l'écart absolu/relatif.</position></attention>
+En effet, ce format garantit que « <italique>si deux nombres du même type à virgule flottante sont consécutifs, alors leurs représentations entières le sont aussi (selon le bit de poids fort pour déterminer le signe, et non la règle du complément à 2).</italique> »
+
+Que signifie ce charabia ? Eh bien, prenons 2 nombres de type <minicode type="c">float</minicode> codés sur 32 bits selon le format IEEE 754 (évidemment, cela s'applique aussi aux <minicode type="c">double</minicode>) :
+<code type="console">Valeur du float                       représentation en mémoire                     binaire                                      hexadécimal    en base 10+1.9999998           0   0111111 1   1111111 11111111 11111110    3F FF FF FE    1073741822+1.9999999           0   0111111 1   1111111 11111111 11111111    3F FF FF FF    1073741823</code>
+Il apparaît que ces 2 nombres sont "consécutifs", il ne peut pas y avoir d'autre nombre du même type dont la valeur serait comprise entre les 2. Or, que constate-t-on ? <gras>Leurs représentations en mémoire</gras>, <gras>si on les lit comme des nombres entiers</gras>, sont également consécutives !
+
+Pour savoir si les deux nombres à comparer sont "voisins", il suffit donc de comparer leur représentation en mémoire convertie en nombre entier.
+
+<information><position valeur="justifie">Par la suite, je dirais (abusivement, certes) "représentation entière" plutôt que représentation en mémoire lue comme un entier" (c'est quand même plus court).</position></information>
+<question><position valeur="justifie">Mais comment accéder à cette représentation entière ?</position></question>
+<barre>Ben, c'est simple, il suffit de faire <minicode type="c">(int)monFloat</minicode> …</barre> Surtout pas ! En faisant ça, on convertit le nombre à virgule en nombre entier, et on obtient donc un nombre arrondi à l'unité. Ça n'a rien à voir avec ce que l'on veut. La bonne formule est donc, tenez-vous bien :
+<gras><minicode type="c">*(int*)&monFloat</minicode></gras>
+Je vous laisse méditer là-dessus. :p Ce n'est pas vraiment compliqué, quand on y pense. Quelques explications si vraiment vous bloquez :<secret>pour comprendre cette expression, il faut en fait la lire de droite à gauche :
+<liste><puce><minicode type="c">&monFloat</minicode> renvoie l'adresse de la variable de type float, donc un pointeur sur float (un <minicode type="c">float*</minicode>) ;</puce><puce><minicode type="c">(int*)</minicode> convertit ce pointeur sur float en un pointeur sur int ; ainsi, l'ordinateur considérera la variable pointée comme un int et non plus plus un float ;</puce><puce>et hop ! le tour est joué, il ne nous reste plus qu'à déréférencer ce pointeur avec <minicode type="c">*</minicode> pour accéder à la variable pointée, cette fois lue comme un entier (int) et non comme un flottant.</puce></liste></secret>
+
+Maintenant, du code avec ce que je viens de vous dire :
+
+<code type="c">#include <stdlib.h>   // pour la fonction abs, renvoyant la valeur absolue d'un entier#include <stdint.h>   /* header du C99, qui fournit des types entiers de taille fixe :                         —  int32_t,  int64_t : entier signé de 32 bits ou de 64 bits ;                         — uint32_t, uint64_t : entier non-signé de 32 bits ou de 64 bits. */#define  INTREPOFFLOAT(f)   ( *(int32_t*)&(f) )   // représentation entière d'un float de 32 bits#define  INTREPOFDOUBLE(d)  ( *(int64_t*)&(d) )   // représentation entière d'un double de 64 bits#define  MAXULPS  5/* ici pour des floats, mais on fait exactement pareil pour des doubles */int floatsAreEqual(float a, float b) {   if(a==b)   return 1;      return abs( INTREPOFFLOAT(a) - INTREPOFFLOAT(b) )  <=  MAXULPS;/* attention à la fonction abs, qui prend un int en argument ; un int fait 16   ou 32 bits : il peut donc être trop petit pour contenir les 32 bits de la   représentation entière d'un float, et sera de toutes façons insuffisant   pour les 64 bits de celle d'un double. Voyez la fonction labs qui prend un   long int, ou llabs (C99) qui prend un long long int, ou mieux, écrivez vos   propres fonctions de valeur absolue, pour 32 et 64 bits (avec les types de   <stdint.h>) ; ainsi, vous n'aurez plus de problèmes de taille des types   pouvant varier. Ici, je garde les fonctions standards par souci de clarté. */}</code>
+La constante <minicode type="c">MAXULPS</minicode> (de ULP, "<italique>Unit of Least Precision</italique>", c'est-à-dire la valeur qui sépare deux flottants consécutifs) nous fournit notre marge d'erreur. Si l'écart entre les représentations entières est inférieur à <minicode type="c">MAXULPS</minicode>, alors on considère que les nombres sont égaux. :)
+
+Ici, la ligne commençant par <minicode type="c">if(a==b)</minicode> est là pour gérer le cas où les deux nombres seraient +0.0 et -0.0. En effet, +0.0 et -0.0 ont des représentations entières très différentes, ce qui fait que la fonction retournerait faux sans ce test préalable (avant, nous comparions des flottants avec l'opérateur <minicode type="c">==</minicode> qui renvoie vrai si les deux nombres sont des zéros de signes différents, ce qui explique pourquoi nous n'avons pas eu de problèmes jusqu'à présent).
+
+En outre, remarquez qu'on utilise les types entiers définis dans le header standard <minicode type="c"><stdint.h></minicode> au lieu des types habituels (<minicode type="c">int</minicode>, <minicode type="c">long int</minicode>…). En effet, la taille de ces derniers dépend de l'implémentation et n'est donc pas connue, il serait donc dangereux (non portable) de s'appuyer dessus ; au contraire, la taille de <minicode type="c">int32_t et int64_t</minicode> est connue et fixe.
+Ce header a été introduit avec C99, c'est pourquoi je vous ai dit qu'on allait devoir se baser sur cette version du langage C.
+
+
+Un peu de maths pour vous aider à choisir votre marge d'erreur (rien de méchant, rassurez-vous) !
+
+Une variation de <math>\Delta mantisse</math> dans la représentation entière de la mantisse codée sur <math>m</math> bits correspond à une variation de la valeur du flottant donnée par la formule suivante : <math>\Delta flottant=\enspace \frac{\Delta mantisse}{2^m} \times 2^{exposant} \enspace= \Delta mantisse \times 2^{exposant-m}</math> (où <math>exposant</math> est l'exposant réel). Cette formule provient directement de celle donnant l'intervalle entre les nombres consécutifs en fonction de l'exposant.
+
+Pour un nombre flottant compris entre 1 et 2, une variation d'un ULP correspond donc à une variation de valeur du nombre flottant de <math>\frac{1}{2^{23}} \approx 1{,}192\times10^{-7}</math> pour un <minicode type="c">float</minicode> et <math>\frac{1}{2^{52}} \approx 2{,}220\times10^{-16}</math> pour un <minicode type="c">double</minicode>.
+
+Si vous choisissez comme moi une marge de 5 ULPs, alors votre marge de valeur (pour un nombre flottant compris entre 1 et 2) sera <math>\frac{5}{2^{23}} \approx 5{,}960\times10^{-7}</math> pour un <minicode type="c">float</minicode> et <math>\frac{5}{2^{52}} \approx 1{,}110\times10^{-15}</math> pour un <minicode type="c">double</minicode>.
+
+
+
+Mais (eh oui, encore un mais) il reste encore un détail à régler, et à ce stade j'aimerais que vous leviez tous la main pour me le dire. Allez, un indice : ça concerne la parenthèse de la phrase en italique de tout à l'heure… :-° Ben oui, le signe ! Les flottants, selon la norme IEE 754, sont signés selon le principe du bit de signe et non du complément à 2. Or, les entiers (du moins sur la grande majorité des ordinateurs aujourd'hui) sont stockés… selon la règle du complément à 2.
+
+Un exemple pour bien voir (je ne vous met plus le binaire, vous êtes grands maintenant) :<code type="console">Valeur du float              représentation en mémoire                         hexadécimal    en base 10 selon le complément à 2+4.2038954 e-45          00 00 00 03     3+2.8025969 e-45          00 00 00 02     2+1.4012985 e-45          00 00 00 01     1+0.0000000               00 00 00 00     0-0.0000000               80 00 00 00    -2147483648-1.4012985 e-45          80 00 00 01    -2147483647-2.8025969 e-45          80 00 00 02    -2147483646-4.2038954 e-45          80 00 00 03    -2147483645</code>
+Comme vous le voyez, le dernier nombre est inférieur à l'avant-dernier, et pourtant sa représentation entière (en <minicode type="c">signed</minicode> comme en <minicode type="c">unsigned</minicode>) est supérieure !
+En vérité, cela ne porte pas à conséquence si l'on compare deux nombres négatifs, car on ne s'intéresse qu'à l'écart entre les représentations entières, qui lui ne change pas ; le problème se pose lorsque l'on compare deux nombres de signes opposés.
+
+Heureusement, il existe une solution. Il suffit de convertir les nombres négatifs selon la règle du bit de signe, en nombres négatifs selon la règle du complément à 2. Je vous laisse chercher ; aidez-vous de l'exemple ci-dessus…
+Trouvé ? Il suffit de garder la valeur telle quelle si le flottant est positif, ou s'il est négatif de soustraire <minicode type="c">0x 80 00 00 00</minicode> à la représentation entière puis d'inverser le signe de cette représentation. Cela revient à faire l'opération suivante :
+<minicode type="c">représentation =  0x 8000 0000  -  représentation ;</minicode>
+Similairement, pour un <minicode type="c">double</minicode> de 64 bits, on fera <minicode type="c">représentation =  0x 8000 0000 0000 0000  -  représentation</minicode>.
+
+On obtient alors ceci :
+<code type="console">Valeur du float              représentation "transformée"                         hexadécimal    en base 10 selon le complément à 2+4.2038954 e-45          00 00 00 03     3+2.8025969 e-45          00 00 00 02     2+1.4012985 e-45          00 00 00 01     1+0.0000000               00 00 00 00     0-0.0000000               00 00 00 00     0   *    (* = a été transformé)-1.4012985 e-45          FF FF FF FF    -1   *-2.8025969 e-45          FF FF FF FE    -2   *-4.2038954 e-45          FF FF FF FD    -3   *</code>
+Comme vous le voyez, les représentations entières sont maintenant cohérentes, on peut les comparer sans problème. Et même les deux zéros (positif/négatif) sont égaux !
+
+
+Du code, du code !
+
+<code type="c">#include <stdlib.h>#include <stdint.h>#define  INTREPOFFLOAT(f)   ( *(int32_t*)&(f) )#define  INTREPOFDOUBLE(d)  ( *(int64_t*)&(d) )#define  MAXULPS  5int floatsAreEqual(float a, float b) {   int32_t aInt= INTREPOFFLOAT(a);   // représentations entières   int32_t bInt= INTREPOFFLOAT(b);      if(aInt<0)   aInt= 0x80000000 - aInt;   // ou 0x8000000000000000 pour des doubles   if(bInt<0)   bInt= 0x80000000 - bInt;/* NOTE: on teste (aInt<0) et non (a<0). En effet, si a==-0.0 (zéro négatif),   alors le test (a<0) renverrait faux, et on garderait la représentation de   -0.0, à savoir 0x80000000. La règle du complément à 2 garde l'avantage du   bit de signe : si le bit de poids fort est à 1, alors le nombre entier est   négatif, et réciproquement ; on peut donc utiliser le test sur l'entier et   non sur le flottant pour savoir s'il faut "transformer" la représentation. */      return abs( aInt - bInt )  <=  MAXULPS;}</code>
+Attention à bien utiliser les types signés (<minicode type="c">int32_t et int64_t</minicode>) et non les non signés (<minicode type="c">uint32_t et uint64_t</minicode>).
+
+
+Bon, ce n'est pas encore parfait, mais c'est très convenable. Quelques points améliorables :
+<liste><puce>les infinis : comme vu précédemment, les infinis sont adjacents aux plus grands nombres en valeur absolue. Notre fonction pourrait par exemple nous dire qu'un nombre positif très très très grand et +<math>\infty</math> sont égaux, alors que ce n'est pas vrai (ne discutez pas, d'un point de vue mathématique c'est faux :lol: ) ;</puce><puce>les NaN : de même, certains NaN pourraient être comparés comme égaux à l'infini ou à un nombre extrêmement grand en valeur absolue, voire à un autre NaN. Or, normalement, n'importe quelle comparaison avec un NaN (hormis <minicode type="c">!=</minicode>) devrait valoir faux.</puce></liste>Ces "détails" peuvent être corrigés avec des vérifications supplémentaires. À ce sujet, les <lien url="http://www.man-linux-magique.net/man3/isinf.html">macros de test de nombres flottants (C99)</lien> peuvent servir. En résumé (je vous invite à consulter le manuel avec le lien précédent) :
+
+<citation nom="Le manuel : fpclassify, isfinite, isnormal, isnan, isinf">Depuis le C99, le header <minicode type="c"><math.h></minicode> définit les macros <minicode type="c">isfinite</minicode>, <minicode type="c">isnormal</minicode>, <minicode type="c">isnan</minicode> et <minicode type="c">isinf</minicode> ; elles prennent toutes un nombre flottant en argument (peu importe son type), et renvoient un booléen indiquant respectivement si le nombre est fini, normalisé, NaN ou infini (le retour de <minicode type="c">isinf</minicode> n'est pas forcément 1 ou 0).
+La macro <minicode type="c">fpclassify</minicode> est également définie. On l'utilise comme les autres, et sa valeur de retour indique le type du nombre flottant (<minicode type="c">FP_ZERO</minicode>, <minicode type="c">FP_SUBNORMAL</minicode>, <minicode type="c">FP_NORMAL</minicode>, <minicode type="c">FP_INFINITE</minicode>, <minicode type="c">FP_NAN</minicode>).
+</citation>
+
+<titre1>Code complet</titre1>
+
+Je vous propose finalement un code complet.
+
+J'y ai introduit une fonction <minicode type="c">cmpFloats</minicode> (ou <minicode type="c">cmpDoubles</minicode>) de mon cru qui permet une comparaison plus générale : en effet, à la manière de <minicode type="c">strcmp</minicode>, elle renvoie -1 si a>b, 0 si a==b ou 1 si a<b ; elle renvoie par ailleurs -2 si l'un des deux nombres au moins est NaN.
+Ainsi, il devient plus facile de tester les deux nombres (j'ai de plus écrit des macros simples pour faciliter les comparaisons). En effet, avant, pour tester par exemple a<b (<souligne>strictement</souligne> inférieur), il fallait faire <minicode type="c">if(a<b && !floatsAreEqual(a,b))</minicode>, ce qui était plus lourd à écrire.
+
+
+<titre2>Header</titre2>
+<secret><code type="c" titre="cmpfloats.h (header)">#ifndef INCLUDE_CMPFLOATS_H#define INCLUDE_CMPFLOATS_H#include <stdint.h>#include <math.h>   /* pour les macros de test des nombres                       flottants ( isnan() et isinf() ) *//* représentation entière du nombre en virgule flottante */#define  INTREPOFFLOAT(f)   ( *(int32_t*)&(f) )#define  INTREPOFDOUBLE(d)  ( *(int64_t*)&(d) )/* marge maximale séparant deux nombres flottants considérés comme égaux,   en termes d'ULPs ("Unit of Least Precision") */#define  MAXULPSFLOAT   5#define  MAXULPSDOUBLE  5/* renvoie vrai (1) si les 2 nombres sont égaux, faux (0) sinon */int floatsAreEqual(float a, float b);int doublesAreEqual(double a, double b);/* renvoie  -1 si a>b,  0 si a==b,  1 si a<b,  ou -2 si a ou b est NaN */int cmpFloats(float a, float b);int cmpDoubles(double a, double b);/* macros booléennes (à utiliser dans des tests simples) */#define  CMPFLOATS_EQUAL(a,b)     (cmpFloats((a),(b))==0)      // =>  a==b#define  CMPFLOATS_UNEQUAL(a,b)   (cmpFloats((a),(b))!=0)      // =>  a!=b#define  CMPFLOATS_GT(a,b)        (cmpFloats((a),(b))==-1)     // =>  a>b#define  CMPFLOATS_LT(a,b)        (cmpFloats((a),(b))==1)      // =>  a<b//#define  CMPFLOATS_GTEQUAL(a,b)   (cmpFloats((a),(b))!=1)      // =>  a>=b//#define  CMPFLOATS_LTEQUAL(a,b)   (cmpFloats((a),(b))!=-1)     // =>  a<=b#define  CMPFLOATS_GTEQUAL(a,b)   ((cmpFloats((a),(b))-1)&2)   // =>  a>=b#define  CMPFLOATS_LTEQUAL(a,b)   (cmpFloats((a),(b))>=0)      // =>  a<=b#define  CMPFLOATS_NAN(a,b)       (cmpFloats((a),(b))==-2)     // =>  a==NaN || b==NaN#define  CMPDOUBLES_EQUAL(a,b)     (cmpDoubles((a),(b))==0)    // =>  a==b#define  CMPDOUBLES_UNEQUAL(a,b)   (cmpDoubles((a),(b))!=0)    // =>  a!=b#define  CMPDOUBLES_GT(a,b)        (cmpDoubles((a),(b))==-1)   // =>  a>b#define  CMPDOUBLES_LT(a,b)        (cmpDoubles((a),(b))==1)    // =>  a<b//#define  CMPDOUBLES_GTEQUAL(a,b)   (cmpDoubles((a),(b))!=1)    // =>  a>=b//#define  CMPDOUBLES_LTEQUAL(a,b)   (cmpDoubles((a),(b))!=-1)   // =>  a<=b#define  CMPDOUBLES_GTEQUAL(a,b)   ((cmpDoubles((a),(b))-1)&2) // =>  a>=b#define  CMPDOUBLES_LTEQUAL(a,b)   (cmpDoubles((a),(b))>=0)    // =>  a<=b#define  CMPDOUBLES_NAN(a,b)       (cmpDoubles((a),(b))==-2)   // =>  a==NaN || b==NaN#endif  //INCLUDE_CMPFLOATS_H</code>
+
+Remarquez que j'ai mis des macros en commentaires (correspondant à <minicode type="c"><=</minicode> et <minicode type="c">>=</minicode>), qui on été remplacées par d'autres. En effet, ces macros ne sont plus valables si <minicode type="c">cmp…</minicode> renvoie -2 (qui est le code pour NaN).
+
+<information><position valeur="justifie">Les macros <minicode type="c">CMP…_GTEQUAL</minicode> de remplacement sont très bizarres. En fait, c'est une astuce que j'ai trouvé pour éviter quelque chose du type <minicode type="c">(cmpFloats((a),(b))==-1 || cmpFloats((a),(b))==0)</minicode>, ce qui est dangereux car a et b sont potentiellement évalués 2 fois, et non optimisé car on appelle 2 fois la fonction <minicode type="c">cmp…</minicode> .
+En fait, les seules macros qui renverront vrai en cas de NaN seront <minicode type="c">CMP…_NAN</minicode> et <minicode type="c">CMP…_UNEQUAL</minicode>.</position></information>
+
+L'utilisation de ces macros est conseillée dans le cas d'un test "simple", c'est-à-dire avec un seul test ; par exemple :<code type="c">instructions1;if(CMPFLOATS_GT(a,b)) { // a>b   instructions2;}instructions3;</code>
+En revanche, il vaut mieux éviter de les enchaîner pour traiter différentes possibilités (si a<b, faire machin, si a>b, faire truc...) le <minicode type="c">else</minicode> est aussi à éviter (car il engloberait aussi le cas de NaN, ce qui dans la plupart des cas n'est pas voulu) :<code type="c">instructions1;if(CMPFLOATS_GT(a,b)) { // a>b   instructions2;}else if(CMPFLOATS_LT(a,b)) { // a<b   /*  /!\  on appelle la fonction cmpFloats 2 fois  */   instructions2b;}else // a==b   instructions2t;   /*  /!\  ce code est aussi exécuté dans le cas de NaN !  */}instructions3;</code>
+Il vaut mieux utiliser un <minicode type="c">switch</minicode> dans ce cas, qui n'appelle la fonction qu'une seule fois tout en permettant un contrôle précis :<code type="c">instructions1;switch(cmpFloats(a,b)) { case -1: // a>b   instructions2;   break; case  0: // a==b   instructions2t;   break; case  1: // a<b   instructions2b;   break; default: break; // NaN}instructions3;</code>Autre exemple pour bien saisir l'utilisation du <minicode type="c">switch</minicode> :<code type="c">instructions1;switch(cmpFloats(a,b)) { case -1: // a>b case  0: // a==b   instructions2;   // ce code est donc exécuté si a>=b   break; case  1: // a<b   instructions2b;   break; default: break; // NaN}instructions3;</code>
+</secret>
+
+<titre2>Fichier source</titre2>
+<secret><code type="c" titre="cmpfloats.c (fichier source)">#include "cmpfloats.h"/* valeur absolue d'un entier de 32 ou 64 bits */uint32_t abs32(int32_t x) {   return x<0? -x : x;   }uint64_t abs64(int64_t x) {   return x<0? -x : x;   }int floatsAreEqual(float a, float b) {      /* vérification pour NaN : si l'un des deux nombres est NaN, alors on      retourne toujours faux */   if(isnan(a) || isnan(b))      return 0;      /* vérification pour les infinis : si l'un des deux nombres est infini,      alors on ne retourne vrai que si les deux nombres sont strictement      égaux (tous les deux +inf ou -inf) */   if(isinf(a) || isinf(b))      return a==b;      int32_t aInt= INTREPOFFLOAT(a);   int32_t bInt= INTREPOFFLOAT(b);   if(aInt<0)   aInt= 0x80000000 - aInt;   if(bInt<0)   bInt= 0x80000000 - bInt;   return abs32( aInt - bInt )  <=  MAXULPSFLOAT;}int doublesAreEqual(double a, double b) {   if(isnan(a) || isnan(b))      return 0;      if(isinf(a) || isinf(b))      return a==b;      int64_t aInt= INTREPOFDOUBLE(a);   int64_t bInt= INTREPOFDOUBLE(b);   if(aInt<0)   aInt= 0x8000000000000000LL - aInt;   if(bInt<0)   bInt= 0x8000000000000000LL - bInt;   return abs64( aInt - bInt )  <=  MAXULPSDOUBLE;}int cmpFloats(float a, float b) {   if(isnan(a) || isnan(b))      return -2;   // -2 si on a au moins un NaN      if(isinf(a) || isinf(b))      return (a<b)? -1 : (a>b)? 1 : 0;   // gestion des infinis similaire à ci-dessous      int32_t aInt= INTREPOFFLOAT(a);   int32_t bInt= INTREPOFFLOAT(b);   if(aInt<0)   aInt= 0x80000000 - aInt;   if(bInt<0)   bInt= 0x80000000 - bInt;   return (abs32(aInt-bInt) <= MAXULPSFLOAT)?  0   // 0 si les nombres sont égaux                               : (aInt<bInt)?  1   // 1 si a<b                               :              -1;  // -1 si a>b}int cmpDoubles(double a, double b) {   if(isnan(a) || isnan(b))      return -2;      if(isinf(a) || isinf(b))      return (a<b)? -1 : (a>b)? 1 : 0;      int64_t aInt= INTREPOFDOUBLE(a);   int64_t bInt= INTREPOFDOUBLE(b);   if(aInt<0)   aInt= 0x8000000000000000LL - aInt;   if(bInt<0)   bInt= 0x8000000000000000LL - bInt;   return (abs64(aInt-bInt) <= MAXULPSDOUBLE)?  0                                : (aInt<bInt)?  1                                :              -1;}</code></secret>
+
+Ce code est à compiler en C99 (utilisation du header <minicode type="c"><stdint.h></minicode>, des macros <minicode type="c">isnan</minicode> et <minicode type="c">isinf</minicode>, déclaration de variables après des instructions, utilisation du suffixe <minicode type="c">LL</minicode> après <minicode type="c">0x8000000000000000</minicode> pour indiquer que c'est un <minicode type="c">long long int</minicode>…).
+
+
+Si vous programmez en C++, pourquoi ne pas surcharger les opérateurs de comparaison ? :-° Cela vous simplifiera la vie (toutefois, vous risquerez alors, à la longue, d'oublier que vous avez fait quelque chose pour pouvoir comparer convenablement des flottants, et un jour ça ne marchera plus car vous n'aurez plus inclus votre petit header magique.)
+
+</position>]]>
+	</texte>
+      </souspartie>
+    
+      <souspartie id="498401">
+	<titre>
+	  <![CDATA[Mais qu'en dit la norme C ?]]>
+	</titre>
+	<texte>
+	  <![CDATA[<position valeur="justifie"><citation nom="Le Zéro harassé">Oh non ! Encore de la théorie !</citation>Rassurez-vous, si vous êtes fatigués, vous pouvez passer cette partie. Elle se destine aux petits curieux qui voudraient aller plus loin pour savoir plus précisément quelle relation entretient IEEE 754 vis à vis de la norme C, et comment déterminer si le compilateur suit bien les formats IEEE 754 ou pas.
+
+
+<titre1>IEEE 754 et la norme C</titre1>
+
+La norme C90 était très floue sur ce sujet, et n'imposait ni ne privilégiait aucun format pour les nombres à virgule flottante. Le C99 a changé cela. En effet, la norme C99 (alias ISO/IEC 9899:TC3, téléchargeable <lien url="http://open-std.org/JTC1/SC22/WG14/www/docs/n1256.pdf">ici</lien> en PDF) introduit le support de la norme IEEE 754.
+
+Voici un extrait le montrant (issu de la liste des changements majeurs depuis le C90) :
+<citation nom="ISO/IEC 9899:TC3 — Foreword (§5, p. xi-xii)">This second edition cancels and replaces the first edition, ISO/IEC 9899:1990 […]. Major changes from the previous edition include:
+[…]
+— IEC 60559 (also known as IEC 559 or IEEE arithmetic) support
+[…]</citation>
+<question>Quoi ? C'est quoi IEC 60559 ? Encore une nouvelle norme au nom tordu !</question>
+Oulala, pas de panique ! IEC 60559, c'est juste un autre nom de IEEE 754.
+
+
+Cette norme est donc <gras>supportée par le langage C depuis sa version C99</gras>. Attention ! <souligne>Supporté</souligne> ne veut pas dire <souligne>imposé</souligne>. Les compilateurs ne sont pas obligés d'adopter les formats IEEE 754. C'est juste que s'ils le font, ils doivent suivre les règles de support spécifiées par la norme C99.
+
+Ce passage le montre clairement :
+<citation nom="ISO/IEC 9899:TC3 — 6.2.6: Representation of types — General (§1, p.37)">The representations of all types are unspecified except as stated in this subclause. […]</citation>
+Cela signifie que la représentation de n'importe quel type (et pas seulement les flottants) est inconnue ; elle reste aux choix du compilateur.
+
+
+Certains compilateurs peuvent supporter plusieurs formats ; dans ce cas, vous devrez spécifier lequel utiliser avec des arguments (sauf si vous voulez garder le format par défaut). GCC, pour sa part, implémente IEEE 754 par défaut, ses utilisateurs peuvent donc dormir sur leurs deux oreilles. :)
+
+
+<question>Mais quelles sont les règles de support de IEEE 754 selon le C99 ?</question>
+La norme C99 comporte une annexe (l'annexe F) dédiée aux nombres flottants, où se trouve la réponse à cette question. En voici le début :
+<citation nom="ISO/IEC 9899:TC3 — Annex F (normative): IEC 60559 floating-point arithmetic (p.444)"><titre2>F.1 Introduction</titre2>
+This annex specifies C language support for the IEC 60559 floating-point standard. The <italique>IEC 60559 floating-point standard</italique> is specifically <italique>Binary floating-point arithmetic for microprocessor systems, second edition</italique> (IEC 60559:1989), previously designated IEC 559:1989 and as <italique>IEEE Standard for Binary Floating-Point Arithmetic</italique> (ANSI/IEEE 754−1985). <italique>IEEE Standard for Radix-Independent Floating-Point Arithmetic</italique> (ANSI/IEEE 854−1987) generalizes the binary standard to remove dependencies on radix and word length. <italique>IEC 60559</italique> generally refers to the floating-point standard, as in IEC 60559 operation, IEC 60559 format, etc. An implementation that defines <minicode type="c">__STDC_IEC_559__</minicode> shall conform to the specifications in this annex. Where a binding between the C language and IEC 60559 is indicated, the IEC 60559-specified behavior is adopted by reference, unless stated otherwise.
+
+<titre2>F.2 Types</titre2>
+The C floating types match the IEC 60559 formats as follows:
+— The <minicode type="c">float</minicode> type matches the IEC 60559 single format.
+— The <minicode type="c">double</minicode> type matches the IEC 60559 double format.
+— The <minicode type="c">long double</minicode> type matches an IEC 60559 extended format, else a non-IEC 60559 extended format, else the IEC 60559 double format.
+Any non-IEC 60559 extended format used for the <minicode type="c">long double</minicode> type shall have more precision than IEC 60559 double and at least the range of IEC 60559 <minicode type="c">double</minicode>.
+<gras>Recommended practice</gras>
+The <minicode type="c">long double</minicode> type should match an IEC 60559 extended format.
+
+[…]
+</citation>
+Bon, l'introduction, ce n'est que du blabla administratif ; on passe pour l'instant.
+
+La suite est plus intéressante. Elle indique que le type <minicode type="c">float</minicode> du langage C doit correspondre au format simple précision (32 bits) de IEC 60559 (alias IEEE 754), etc., etc.
+Il est aussi question du type <minicode type="c">long double</minicode>, dont j'ai peu parlé dans ce tutoriel ; sachez qu'en C, son format est moins bien défini, mais qu'il correspond souvent au format de double précision étendue de IEEE 754 (dont je n'ai pas parlé non plus), ou alors au format de double précision tout court (comme un <minicode type="c">double</minicode>).
+
+Je ne parlerai pas de la suite de cette annexe, vous pouvez la lire si vous voulez (vous êtes grands). Elle décrit notamment le comportement des opérations sur les flottants.
+
+
+Enfin, sachez que :<citation rid="6397951">un système peut visiblement encoder les nombres flottants suivant le format défini par la norme IEEE 754, sans pour autant remplir toutes les conditions de l'annexe F de la norme C99 (<lien url="http://bytes.com/topic/c/answers/770825-ieee754-fp">cf ce sujet</lien>).</citation>
+Dans le cadre de ce tutoriel, qui s'est surtout focalisé sur les formats de représentation des flottants, cela ne devrait pas poser trop de problème. En effet, n'importe quelle implémentation de IEEE 754, même partielle, devrait au moins respecter les formats spécifiés par cette norme et les correspondances avec les deux types principaux du C (<minicode type="c">float</minicode> pour 32 bits, <minicode type="c">double</minicode> pour 64 bits).
+
+Le non-respect partiel de la norme IEEE 754 peut aussi être le fait d'options du compilateur. Par exemple, l'option d'optimisation <minicode type="console">-ffast-math</minicode> de GCC améliore les performances en accélérant les calculs sur les nombres flottants, mais enfreint certaines règles de IEEE 754.
+
+
+Je reviens sur l'introduction, elle contient quelque chose d'intéressant. Il est dit que si la macro <minicode type="c">__STDC_IEC_559__</minicode> est définie, alors c'est le format IEEE 754 qui est utilisé. Cela peut vous être utile pour faire des tests ou adapter votre code. ;)
+Cependant, le contraire n'est pas vrai ! Vous pouvez parfaitement avoir une implémentation qui suit IEEE 754 mais qui ne définit pas cette constante. Cela semble être le cas de GCC sous Windows (portage MinGW par exemple), car GCC laisse cette définition aux headers du système ; or, ceux de Windows ne définissent pas <minicode type="c">__STDC_IEC_559__</minicode>, en partie parce qu'il y aurait un risque d'incompatibilité entre GCC et la bibliothèque C de Windows.
+
+
+<titre1>En pratique : savoir si l'implémentation utilise IEEE 754</titre1>
+
+Puisqu'on ne peut pas compter sur la constante <minicode type="c">__STDC_IEC_559__</minicode> pour nous renseigner, il faut trouver un autre moyen de déterminer si oui ou non on travaille avec IEEE 754.
+
+
+Pour cela, le meilleur moyen reste de se renseigner auprès de votre compilateur favori et/ou de votre plateforme cible.
+
+
+Toutefois, si vous tenez vraiment à faire cette vérification avec du code, je peux vous offrir des pistes…
+<liste><puce><souligne>dynamiquement (c'est-à-dire au moment de l'exécution de votre programme) :</souligne> Vous pouvez par exemple déclarer un certain nombre de variables de type à virgule flottante, puis vérifier que leur représentation mémoire correspond à celle attendue en se basant sur IEEE 754. Il faudrait effectuer cette série de tests pour les différents types de nombres (zéros, dénormalisés, normalisés, infinis, NaNs).
+Un tel code ne serait pas infaillible (on peut très bien imaginer des formats ressemblant à IEEE 754, qui passeraient avec succès tous les tests) mais il permet d'éliminer certains formats.
+
+L'inconvénient est que du code inutile est intégré à l'exécutable, et que l'on perd du temps à chaque exécution du programme lorsqu'on effectue ces vérifications. À éviter en pratique, donc.
+D'un point de vue technique, cela reste cependant un bon exercice. :ange: 
+ </puce><puce><souligne>statiquement (c'est-à-dire lors de la compilation) :</souligne> Pour cela, il faut vous appuyer sur votre ami le préprocesseur. Sans détailler, vous pouvez tester la valeur des macros définies dans le header <lien url="http://www.gnu.org/s/hello/manual/libc/Floating-Type-Macros.html"><police nom="courier"><float.h></police></lien> du C99 ; celles-ci caractérisent l'implémentation des nombres flottants :  précision, exposants minimum et maximum, valeurs minimales et maximales… Tout cela en 3 variantes pour chacun des 3 types à virgule flottante du C.
+
+Cette approche présente l'avantage de ne garder que le code nécessaire lors de la compilation et de ne pas faire cette vérification à l'exécution.
+Mais avouez que c'est fichtrement moins rigolo.</puce></liste>L'avantage serait que le bon fonctionnement du code est indépendant du compilateur utilisé, facilitant ainsi les échanges de code.
+
+Notez toutefois que les propositions ci-dessus vérifient la représentation en mémoire, mais pas les différentes opérations sur les flottants. C'est donc incomplet.
+
+</position>]]>
+	</texte>
+      </souspartie>
+    
+  </sousparties>
+  
+    <qcm>
+      
+	<question id="29695">
+	  <label>
+	    <![CDATA[Quels sont les types à virgule flottante dont on dispose en C ?]]>
+	  </label>
+	  <reponses>
+	    
+	      <reponse vrai="0" id="105206">
+		<![CDATA[float et double ;]]>
+	      </reponse>
+	    
+	      <reponse vrai="1" id="105207">
+		<![CDATA[float, double et long double ;]]>
+	      </reponse>
+	    
+	      <reponse vrai="0" id="105208">
+		<![CDATA[float et long float ;]]>
+	      </reponse>
+	    
+	      <reponse vrai="0" id="105209">
+		<![CDATA[float, long float et long long float ;]]>
+	      </reponse>
+	    
+	      <reponse vrai="0" id="105210">
+		<![CDATA[float et double float ;]]>
+	      </reponse>
+	    
+	      <reponse vrai="0" id="105211">
+		<![CDATA[float, double float et long double float.]]>
+	      </reponse>
+	    
+	  </reponses>
+	  <explication>
+	    <![CDATA[<position valeur="justifie">Bon, cette question n'était pas trop dure, c'était juste pour vous embrouiller. :p 
+En C, on dispose donc de <minicode type="c">float</minicode>, <minicode type="c">double</minicode> et <minicode type="c">long double</minicode> (ne pas oublier ce dernier, même si j'en ai moins parlé).</position>]]>
+	  </explication>
+	</question>
+      
+	<question id="29700">
+	  <label>
+	    <![CDATA[Comment s'appelle la norme dont il est question dans ce tutoriel, qui définit des formats de nombre flottants ?]]>
+	  </label>
+	  <reponses>
+	    
+	      <reponse vrai="0" id="105231">
+		<![CDATA[ISO/IEC 8859-15:1999 ;]]>
+	      </reponse>
+	    
+	      <reponse vrai="1" id="105232">
+		<![CDATA[ANSI/IEEE Std 754-1985 ;]]>
+	      </reponse>
+	    
+	      <reponse vrai="0" id="105233">
+		<![CDATA[ISO/IEC 9899:1999 ;]]>
+	      </reponse>
+	    
+	      <reponse vrai="0" id="105234">
+		<![CDATA[ISO 8899:2003.]]>
+	      </reponse>
+	    
+	  </reponses>
+	  <explication>
+	    <![CDATA[<position valeur="justifie">C'était bien sûr (haha) la norme <gras>ANSI/IEEE std 754-1985</gras> ! Dans ce tutoriel, je la désignais souvent par son "diminutif" courant IEEE 754. Son nom complet est : "<gras>ANSI/IEEE Std 754-1985 — <italique>IEEE Standard for Binary Floating-Point Arithmetic</italique></gras>", mais elle est aussi connue sous le nom de "<gras>IEC 60559:1989 — <italique>Binary floating-point arithmetic for microprocessor systems</italique></gras>".
+
+Pour votre culture générale :<liste><puce><gras><lien url="http://www.iso.org/iso/fr/iso_catalogue/catalogue_tc/catalogue_detail.htm?csnumber=29505">ISO 8859-15</lien></gras> (<gras>ISO/IEC 8859-15:1999</gras>) est la norme d'encodage sur 8 bits communément appelée <italique>Latin-9</italique> ;</puce><puce><gras><lien url="http://www.iso.org/iso/fr/iso_catalogue/catalogue_tc/catalogue_detail.htm?csnumber=29237">ISO 9899</lien></gras> (<gras>ISO/IEC 9899:1999</gras>) est la norme du langage C (plus précisément, le C99) ; cette norme a été corrigée plusieurs fois, la dernière version en date est <lien url="http://www.iso.org/iso/fr/iso_catalogue/catalogue_tc/catalogue_detail.htm?csnumber=50510">ISO/IEC 9899:1999/Cor 3:2007 ;</lien></puce><puce><gras><lien url="http://www.iso.org/iso/fr/iso_catalogue/catalogue_tc/catalogue_detail.htm?csnumber=34432">ISO 8899</lien></gras> (<gras>ISO 8899:2003</gras>) est une norme spécifiant quelques caractéristiques de "<italique>L'huile essentielle de petitgrain citronnier</italique>". Comme quoi il faut faire très attention en tapant un numéro. :-° </puce></liste>Intéressant, n'est-ce-pas ?
+
+Bien sûr, vous pouvez tout de suite oublier tout ça (surtout la dernière), on s'en moque éperdument. :lol: Je me tapais un délire tout seul là.</position>]]>
+	  </explication>
+	</question>
+      
+	<question id="29718">
+	  <label>
+	    <![CDATA[Quelle est sa relation vis à vis de la norme du langage C ?]]>
+	  </label>
+	  <reponses>
+	    
+	      <reponse vrai="0" id="105307">
+		<![CDATA[Elle est pleinement supportée par la norme C.]]>
+	      </reponse>
+	    
+	      <reponse vrai="0" id="105308">
+		<![CDATA[Le C90 l'imposait, mais plus le C99.]]>
+	      </reponse>
+	    
+	      <reponse vrai="0" id="105309">
+		<![CDATA[Elle est imposée depuis le C99.]]>
+	      </reponse>
+	    
+	      <reponse vrai="0" id="105310">
+		<![CDATA[Le C90 la supportait, mais plus le C99.]]>
+	      </reponse>
+	    
+	      <reponse vrai="1" id="105311">
+		<![CDATA[Elle est supportée depuis le C99.]]>
+	      </reponse>
+	    
+	      <reponse vrai="0" id="105312">
+		<![CDATA[Elle n'est pas supportée par la norme C, et le format des nombres flottants dépend entièrement de l'implémentation.]]>
+	      </reponse>
+	    
+	  </reponses>
+	  <explication>
+	    <![CDATA[<position valeur="justifie">Attention à la différence entre "supporter" et "imposer".
+<liste><puce><gras>imposer :</gras> cela fait partie du langage, ça doit obligatoirement être comme cela et pas autrement ;</puce><puce><gras>supporter :</gras> cet aspect est laissé au choix de l'implémentation (en gros, cela dépend du processeur et du compilateur), mais si une solution supportée est adoptée, alors l'implémentation doit suivre les règles de support spécifiées dans la norme C.</puce></liste>
+Le format IEEE 754, bien que très majoritaire, n'est pas imposé par le C, juste supporté (c'est-à-dire que des règles sont spécifiées : un <minicode type="c">float</minicode> doit correspondre au format 32 bits simple précision de IEEE 754, un <minicode type="c">double</minicode> au 64 bits…), et ce seulement depuis le C99 ; le C90 restait assez vague sur le sujet.</position>]]>
+	  </explication>
+	</question>
+      
+	<question id="29701">
+	  <label>
+	    <![CDATA[Selon elle, quels sont les deux formats principaux ?]]>
+	  </label>
+	  <reponses>
+	    
+	      <reponse vrai="0" id="105235">
+		<![CDATA[<span class="italique">pas précis</span> (8 bits)  &  <span class="italique">précision</span> (64 bits) ;]]>
+	      </reponse>
+	    
+	      <reponse vrai="0" id="105236">
+		<![CDATA[<span class="italique">précision simple</span> (16 bits)  &  <span class="italique">précision double</span> (32 bits) ;]]>
+	      </reponse>
+	    
+	      <reponse vrai="1" id="105237">
+		<![CDATA[<span class="italique">précision simple</span> (32 bits)  &  <span class="italique">précision double</span> (64 bits) ;]]>
+	      </reponse>
+	    
+	      <reponse vrai="0" id="105238">
+		<![CDATA[<span class="italique">précision simple</span> (32 bits)  &  <span class="italique">précision complexe</span> (128 bits) ;]]>
+	      </reponse>
+	    
+	      <reponse vrai="0" id="105239">
+		<![CDATA[<span class="italique">précision quitte</span> (32 bits)  &  <span class="italique">précision double</span> (64 bits) ;]]>
+	      </reponse>
+	    
+	      <reponse vrai="0" id="105240">
+		<![CDATA[Cela dépend de l'implémentation (machine, système d'exploitation et compilateur).]]>
+	      </reponse>
+	    
+	  </reponses>
+	  <explication>
+	    <![CDATA[<italique>Aucun commentaire. :-° </italique>]]>
+	  </explication>
+	</question>
+      
+	<question id="29722">
+	  <label>
+	    <![CDATA[Qu'est-ce que la mantisse d'un nombre flottant ?]]>
+	  </label>
+	  <reponses>
+	    
+	      <reponse vrai="0" id="105329">
+		<![CDATA[Son bit de poids fort, qui indique le signe du nombre flottant ;]]>
+	      </reponse>
+	    
+	      <reponse vrai="0" id="105330">
+		<![CDATA[le champ contenant l'exposant du nombre flottant (en termes de puissance de 2) ;]]>
+	      </reponse>
+	    
+	      <reponse vrai="1" id="105331">
+		<![CDATA[le champ contenant la partie fractionnaire du nombre flottant ;]]>
+	      </reponse>
+	    
+	      <reponse vrai="0" id="105332">
+		<![CDATA[une créature mythologique monstrueuse pourvue d'une tête humaine, d'un corps de lion et d'une queue de serpent.]]>
+	      </reponse>
+	    
+	  </reponses>
+	  <explication>
+	    <![CDATA[Relisez la partie correspondante du tutoriel si vous vous êtes trompés.]]>
+	  </explication>
+	</question>
+      
+	<question id="29767">
+	  <label>
+	    <![CDATA[Quels sont les exposants (en termes de puissances de 2) permis par un <minicode type="c">float</minicode> pour un nombre fini non nul (c'est-à-dire dénormalisé ou normalisé) écrit sous sa forme scientifique ? <souligne>Réfléchissez bien.</souligne>]]>
+	  </label>
+	  <reponses>
+	    
+	      <reponse vrai="0" id="105499">
+		<![CDATA[De 0 à 255 ;]]>
+	      </reponse>
+	    
+	      <reponse vrai="0" id="105500">
+		<![CDATA[de -128 à 128 ;]]>
+	      </reponse>
+	    
+	      <reponse vrai="0" id="105501">
+		<![CDATA[de -127 à 128 ;]]>
+	      </reponse>
+	    
+	      <reponse vrai="0" id="105502">
+		<![CDATA[de -127 à 127 ;]]>
+	      </reponse>
+	    
+	      <reponse vrai="0" id="105503">
+		<![CDATA[de -126 à 127 ;]]>
+	      </reponse>
+	    
+	      <reponse vrai="1" id="105504">
+		<![CDATA[de -149 à 127.]]>
+	      </reponse>
+	    
+	  </reponses>
+	  <explication>
+	    <![CDATA[<position valeur="justifie">Question piège, je l'avoue.
+
+L'exposant, qui peut être négatif, est stocké en mémoire non selon le complément à 2, mais selon un <souligne>décalage de +127</souligne>. On élimine donc d'office la réponse 1 (et la 2, car on ne peut pas avoir -128 avec un tel décalage).
+
+Ensuite, nous avons vu que l'exposant maximal, soit 128 (255 une fois décalé) était réservé pour les infinis et NaNs ; comme j'avais précisé dans la question que je parlais des <souligne>nombres finis</souligne>, on élimine aussi cette possibilité (réponse 3).
+
+J'avais bien précisé « <italique>l'exposant <souligne>réel</souligne></italique> ». Or, comme nous l'avons vu dans la sous-partie sur les nombres dénormalisés, ceux-ci ont pour exposant réel -126 et non -127, ceci pour assurer la continuité avec les premiers nombres normalisés. On élimine donc la réponse 4 et on garde la 5.
+
+<gras>Sauf que</gras> ! Quel est le plus petit nombre dénormalisé que l'on peut stocker ? <taille valeur="tpetit">0b</taille> 0,00000000000000000000001 ×2<exposant>-126</exposant>. Or, dans la question, j'avais demandé l'exposant du nombre une fois « <italique>écrit sous sa forme <souligne>scientifique</souligne></italique> ». Si l'on normalise le nombre précédent, on trouve 1 ×2<exposant>-149</exposant> (-126-23=-149) ! Il fallait donc choisir la 6ème et dernière réponse. :) </position>]]>
+	  </explication>
+	</question>
+      
+	<question id="29727">
+	  <label>
+	    <![CDATA[Quelle est l'inconvénient de l'opérateur de comparaison <minicode type="c">==</minicode> ?]]>
+	  </label>
+	  <reponses>
+	    
+	      <reponse vrai="1" id="105353">
+		<![CDATA[Il ne tient pas compte des arrondis.]]>
+	      </reponse>
+	    
+	      <reponse vrai="0" id="105354">
+		<![CDATA[Il considère <span class="code2 c"><span class="o">+</span><span class="mf">0.0</span></span> et <span class="code2 c"><span class="o">-</span><span class="mf">0.0</span></span> comme différents.]]>
+	      </reponse>
+	    
+	      <reponse vrai="0" id="105355">
+		<![CDATA[Il n'est pas <span class="barre">potable</span> portable.]]>
+	      </reponse>
+	    
+	      <reponse vrai="0" id="105356">
+		<![CDATA[Il ne fonctionne correctement que si le programme est compilé du haut d'une colline par une nuit de pleine Lune.]]>
+	      </reponse>
+	    
+	  </reponses>
+	  <explication>
+	    <![CDATA[<italique>Sans commentaire.</italique>]]>
+	  </explication>
+	</question>
+      
+    </qcm>
+  
+  <conclusion>
+    <![CDATA[<position valeur="justifie">Voilà, ce cours touche à sa fin ! Il a été très théorique, j'espère que vous avez digéré.
+Vous savez maintenant comment vous servir des nombres à virgule en C, et comment ils fonctionnent <italique>under the hood</italique> (sous le capot). On a aussi vu les difficultés de leur utilisation, et comment les contourner.
+
+J'espère que vous avez apprécié le voyage, et bon code !
+Faites-nous de beaux programmes mathématiques ! <taille valeur="ttpetit"><italique>(pas des antisèches, hein ? :p )</italique></taille>
+
+Si vous voulez aller encore plus loin, je ne peux que vous conseiller de lire <lien url="http://www.siteduzero.com/tutoriel-3-528426.html">ce tutoriel</lien> qui décrit comment sont gérés les nombres flottants au niveau matériel (le processeur).
+
+
+Sources :<liste><puce>articles de Wikipédia : <lien type="wikipedia" url="Virgule_flottante">virgule flottante</lien>, <lien type="wikipedia" url="IEEE_754">IEEE 754</lien> (n'hésitez pas à aller sur les articles anglais qui sont bien plus complets) ;</puce><puce>wikilivre (actuellement en rédaction) : <lien url="http://fr.wikibooks.org/wiki/Arithmétique_flottante">Arithmétique flottante</lien> ;</puce><puce>page présentant l'astuce pour comparer des flottants : <lien url="http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm">http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm</lien> <police nom="impact">(en)</police> ;</puce><puce>la norme C99 ! ou plutôt son draft (n1256), disponible <lien url="http://open-std.org/JTC1/SC22/WG14/www/docs/n1256.pdf">ici</lien> en PDF <police nom="impact">(en)</police>.</puce></liste>
+Liens additionnels :<liste><puce>page de manuel de <minicode type="c">isinf</minicode>, <minicode type="c">isnan</minicode>, etc. : <lien>http://www.man-linux-magique.net/man3/isinf.html</lien> ;</puce><puce>pages du manuel de la lib GNU C concernant les flottants (concepts, constantes fournies par <minicode type="c"><float.h></minicode>, exemple pour IEEE 754) : <lien url="http://www.gnu.org/s/hello/manual/libc/Floating-Type-Macros.html">http://www.gnu.org/s/hello/manual/libc/Floating-Type-Macros.html</lien> <police nom="impact">(en)</police> ;</puce><puce><gras>site très pratique permettant de calculer la représentation en mémoire d'un nombre à virgule et l'inverse, pour les deux formats principaux de IEEE 754 (32 et 64 bits) : <lien>http://babbage.cs.qc.edu/IEEE-754/</lien></gras> <police nom="impact">(en)</police>.</puce></liste>
+
+<information><position valeur="justifie">Je tiens à remercier tous ceux qui ont participé à <lien url="http://www.siteduzero.com/forum-83-663077-p1-les-nombres-a-virgule-flottante-du-point-de-vue-de-la-norme.html">cette discussion</lien> sur le forum, et en particulier <gras>Taurre</gras> (ainsi que <gras>yoch</gras>) ; ils m'ont beaucoup aidé pour la dernière partie de ce cours, consacrée à la norme C.
+Un grand merci également au bêta-testeurs pour leur précieuse assistance et le temps qu'ils ont consacré à ce tutoriel : je citerai surtout <gras>mewtow</gras>, <gras>Adroneus</gras> et <gras>yoch</gras> (sans oublier <gras>programLyrique</gras> et <gras>Duarna</gras>).</position></information>
+
+
+</position>]]>
+  </conclusion>
+</minituto>

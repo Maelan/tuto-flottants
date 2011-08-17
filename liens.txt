@@ -1,0 +1,14 @@
+﻿
+FIVE TIPS FOR FLOATING-POINT CODING
+	http://www.codeproject.com/KB/recipes/float_point.aspx
+
+<FENV.H>
+	http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/fenv.h.html
+
+COMPATIBILITÉ WINDOWS-MINGW POUR LONG DOUBLE
+	http://www.phwinfo.com/forum/comp-lang-c/230313-ldbl_max-1-qnan0e-000-mingw-2.html
+
+TUTO SUR LE FPU
+	http://www.website.masmforum.com/tutorials/fptute/
+
++ les liens déjà données dans la conclusion du tutoriel

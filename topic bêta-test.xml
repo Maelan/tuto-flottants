@@ -1,0 +1,883 @@
+﻿<titre2>Topic du bêta-test du tuto sur les nombres flottants (1/2)</titre2>
+<secret>
+
+
+
+<citation nom="Maëlan">Bonjour,
+
+Un cours qui détaille l'utilisation des <gras>nombres à virgule en C</gras>, comment ils sont représentés en mémoire (selon IEEE 754), les difficultés de leur utilisation (notamment la comparaison tenant compte des erreurs) et des astuces pour les contourner ; est également fait un point sur la norme.
+
+Je ne détaille pas plus, lisez l'introduction. :-° 
+
+
+J'attends vos critiques, remarques, suggestions...
+J'ai personnellement quelques critiques, mais je préfère les garder pour moi pour l'instant, pour ne pas vous influencer et voir si elles sont fondées.
+
+Merci d'avance de votre attention !
+
+
+
+
+
+<titre1>Suggestions, critiques...</titre1>
+
+<titre2>Proposées</titre2><liste>
+<puce><lien url="#r6403608"># Adroneus</lien> : <gras>(II)</gras> Expliquer comment on trouve l'écriture binaire de 3141,5</puce>
+<puce><lien url="#r6403608"># Adroneus</lien> : <gras>(II)</gras> Préciser que le préfixe 0b désigne un nombre en binaire</puce>
+<puce><lien url="#r6406088"># yoch</lien> : <gras>(VI)</gras> parler de l'option d'optimisation <minicode type="console">-ffast-math</minicode> de GCC qui enfreint partiellement IEEE 754</puce>
+<puce><lien url="#r6406088"># yoch</lien> : aborder le thème de l'architecture matérielle <gras>(débat en cours)</gras></puce>
+</liste>
+
+<titre2>Acceptées, en réalisation</titre2><liste>
+<puce><lien url="#r6406196"># mewtow</lien> : <gras>(IV)</gras> précisions sur les différentes opérations (+, -, *, /) : arrondis, ordre, astuces...</puce>
+<puce><lien url="#r6406088"># yoch</lien> : mettre davantage d'exemples concrets (par exemple pour les problèmes d'arrondis)</puce>
+</liste>
+
+<titre2>Réalisées, en attente de confirmation des bêta-testeurs</titre2><liste>
+<puce><italique>Avis général</italique> : Aérer</puce>
+<puce><italique>Avis général</italique> : Ne pas abuser des balises <minicode type="zcode"><information></minicode></puce>
+<puce><lien url="#r6403608"># Adroneus</lien> : <gras>(V)</gras> Placer les déclarations en début de fonction pour être conforme en C90 enseigné par le tuto officiel</puce>
+<puce><gras>(VI)</gras> revoir le code permettant de savoir si on a l'implémentation de IEEE 754 (cf ce propre topic et <lien url="http://www.siteduzero.com/forum-83-663077-p1-les-nombres-a-virgule-flottante-du-point-de-vue-de-la-norme.html#r6404337">celui-ci</lien> du forum C) ; il est discuté par <gras>yoch</gras> pour<liste>
+<puce>son utilité : mieux vaut chercher dans la doc de son compilo et de sa plate-forme que de faire ces vérifications en dynamique (j'ai proposé une autre solution se basant sur les macroconstantes de <lien url="http://www.gnu.org/s/hello/manual/libc/Floating-Type-Macros.html"><float.h></lien>, donc en statique)</puce>
+<puce>son efficacité : ne vérifie que la représentation mémoire et pas le comportement (opérations)</puce>
+</liste></puce>
+</liste>
+
+<titre2>Réalisées</titre2><liste>
+<puce><lien url="#r6403608"># Adroneus</lien> : <gras>(I)</gras> Syntaxe en C pour écrire une constante à virgule : séparer le <minicode type="c">0</minicode> tout court des autres exemples</puce>
+<puce><lien url="#r6403608"># Adroneus</lien> & <lien url="#r6403842"># Duarna</lien> : <gras>(II)</gras> 1er tableau : expliciter la notation « <math>\pm 1,2 \times 10^{-38}</math> à <math>\pm 3,4 \times 10^{38}</math> »</puce>
+<puce><lien url="#r6403608"># Adroneus</lien> : <gras>(II)</gras> Préciser que la division par 0 de nombres <souligne>entiers</souligne> fait planter le programme</puce>
+<puce><lien url="#r6402277"># programLyrique</lien> : <gras>(II)</gras> Préciser que <minicode type="c">x / ±0.0</minicode> (<math>x\ne\pm0.0</math>) donne <math>\pm\infty</math> et non NaN</puce>
+<puce><lien url="#r6406088"># yoch</lien> : <gras>(IV)</gras> parler de l'option <minicode type="console">-Wfloat-equal</minicode> de GCC qui avertit de l'utilisation de == sur des flottants</puce>
+</liste>
+</citation>
+
+
+
+<citation nom="mewtow">J'ai une remarque à faire qui concerne un détail la forme de ton tutoriel : tu utilise souvent des balises informations alors que ce que tu mets dedans pourrait être mit directement dans le texte du tutoriel. Mine de rien, ça nuit à une bonne mise en forme du contenu.
+
+A part ça, j'ai une seule chose à dire : ce tutoriel est vraiment génial !</citation>
+
+
+
+<citation nom="b@llon">Je plussoie mewtow même si ce tutoriel est excellent ;) ! </citation>
+
+
+
+<citation nom="programLyrique"><gras>-0.0</gras> et <gras>+0.0</gras> ont une utilité à mon avis.
+ Ils permettent de simuler les limites du type : 
+<math>\lim_{x \mapsto 0^+} \textrm{f}(x)</math> ou <math>\lim_{x \mapsto 0^-} \textrm{f}(x)</math>, pour aboutir à des choses comme <math>+ \infty</math> ou <math>- \infty</math> respectivement.
+Par exemple : <minicode type="c">1. / -0.</minicode> devrait donner <math>- \infty</math>.</citation>
+
+
+
+<citation nom="Adroneus">La derniere fois que j'ai fait une division par 0 dans un de mes programmes, ca a plante =) . J'ai lu ton tutoriel en diagonale, je le lirai plus attentivement demain, donc je ne ferai pas de remarques sur le fond. En revanche sur la forme, je plussoie egalement mewtow et je pense que tu devrais aerer ton texte, ca fait un gros pave la.
+
+Sinon, de ce j'ai lu c'est interessant, bien explique, de sorte a ce que meme un Zero puisse comprendre. Tu auras donc mon avis sur le fond demain =)
+
+Bien joue et bonne soiree </citation>
+
+
+
+<citation nom="Maëlan"><gras>@mewton</gras> : C'est effectivement une des choses que je voyais à améliorer, avec l'aération (<gras>Adroneus</gras>).
+
+<gras>@programLyrique</gras> : Oui, avec des flottants, <minicode type="c">1.0 / +0.0</minicode> donne <math>+\infty</math> et <minicode type="c">1.0 / -0.0</minicode> donne <math>-\infty</math> (<minicode type="c">±0.0 / ±0.0</minicode> donne NaN). Je m'en sert d'ailleurs dans le tout dernier code. J'aurais peut-être dû le préciser (actuellement je dis qu'une division par 0 renvoie NaN, ce qui peut induire en erreur puisqu'elle peut aussi renvoyer <math>\pm\infty</math>).
+
+ <citation rid="6402847">La derniere fois que j'ai fait une division par 0 dans un de mes programmes, ca a plante =)</citation>Peut-être parce que c'était une division de nombres entiers.
+
+
+Merci de vos remarques, je vais tâcher d'améliorer ces points. :)</citation>
+
+
+
+<citation nom="Adroneus"><citation nom="Maelan44">Peut-être parce que c'était une division de nombres entiers.</citation>
+Oui. Tu devrais peut etre le preciser en tout petit dans ton tuto ;)
+
+Bien, premiere remarque toujours sur la forme. Quand tu dis : 
+
+<citation nom="Tuto">Par exemple, les constantes suivantes sont strictement identiques</citation>
+
+Pour toutes les manieres d'ecrire zero. Tu ne devrais pas mettre l'exception (le 0 entier) avec les autres maisil devrait faire l'objet d'une remarque a part juste en dessous, ama.
+
+Ensuite, tu ecris tes representations binaires avec le prefixe 0b, pourquoi? C'est une convention d'ecriture? (si c'est le cas je ne la connais pas et tu devrais la preciser au debut du tuto). Sinon, c'est a cause du fait que ce prefixe est disponible sous GCC?
+Si c'est le cas, tu ne devrais pas l'employer ici car cette ecriture n'est pas valide avec tous les compilateurs.
+
+Je pense que tu devrais plus expliquer comment tu trouves la representation binaire du nombre -3141,5.
+
+<citation nom="Tuto"><math>\pm 1,2 \times 10^{-38}</math> à <math>\pm 3,4 \times 10^{38}</math></citation>
+
+De ce que j'ai compris, tu veux designer la reunion d'intervalles : <math>[-3,4 \times 10^{38} ; -1,2 \times 10^{-38}] \cup [1,2 \times 10^{-38} ; 3,4 \times 10^{38}]</math>
+Si c'est le cas, je pense que cette notation est preferable.
+
+J'ai pas le temps de lire le reste maintenant, j'editerais cet apres midi ;)
+
+<gras><souligne>Edit :</souligne></gras>
+
+J'ai pas de remarques jusqu'au premier code en C.
+
+je vois un <minicode type="c">bool</minicode>, je suppose donc que tu codes suivant la norme C99, tu dois inclure <minicode type="c">stdbool.h</minicode> pour utiliser ce type.
+
+Petite remarque : 
+Je ne sais pas si ton tutoriel s'adresse a des zeros ou pas, car si c'est le cas, tu ne devrais pas declarer tes variables apres un branchement conditionnel. Etant donne que l'on apprend a coder en suivant la norme C89 dans le tuto de M@téo21, cela pourrait en destabiliser certains.
+
+Pas d'autres remarques, je trouve que ton tutoriel est tres bien, encore une fois, pense a aerer. Les balises information sont trop nombreuses (comment ca je radote).
+
+Somme toute, quelques broutilles concernant la clarte, rien de mechant, tres bon tuto ;)</citation>
+
+
+
+<citation nom="Maëlan"><citation rid="6403608"><citation nom="Maelan44">Peut-être parce que c'était une division de nombres entiers.</citation>
+Oui. Tu devrais peut etre le preciser en tout petit dans ton tuto ;)</citation>Bonne idée :)
+
+
+<citation rid="6403608">Bien, premiere remarque toujours sur la forme. Quand tu dis : 
+<citation nom="Tuto">Par exemple, les constantes suivantes sont strictement identiques</citation>
+
+Pour toutes les manieres d'ecrire zero. Tu ne devrais pas mettre l'exception (le 0 entier) avec les autres maisil devrait faire l'objet d'une remarque a part juste en dessous, ama.</citation>Mmmh, si tu veux.
+
+
+<citation rid="6403608">Ensuite, tu ecris tes representations binaires avec le prefixe 0b, pourquoi? C'est une convention d'ecriture? (si c'est le cas je ne la connais pas et tu devrais la preciser au debut du tuto). Sinon, c'est a cause du fait que ce prefixe est disponible sous GCC?
+Si c'est le cas, tu ne devrais pas l'employer ici car cette ecriture n'est pas valide avec tous les compilateurs.</citation>
+Non, le préfixe <gras>0b</gras> est une convention d'écriture pour indiquer que le nombre qui suit est écrit en binaire (de même que <gras>0x</gras> indique de l'hexadécimal). Ce n'est pas du C (d'ailleurs remarques que je ne l'utilise dans aucun code), car on ne peut pas écrire de constante en binaire en C.
+
+
+<citation rid="6403608">Je pense que tu devrais plus expliquer comment tu trouves la representation binaire du nombre -3141,5.</citation>Tu crois vraiment ? Dans le tuto je me base sur le fait que le lecteur maîtrise déjà le binaire... Ou alors je le mets en secret ? Qu'en penses-tu ?
+
+
+<citation rid="6403608"><citation nom="Tuto"><math>\pm 1,2 \times 10^{-38}</math> à <math>\pm 3,4 \times 10^{38}</math></citation>De ce que j'ai compris, tu veux designer la reunion d'intervalles : <math>[-3,4 \times 10^{38} ; -1,2 \times 10^{-38}] \cup [1,2 \times 10^{-38} ; 3,4 \times 10^{38}]</math>
+Si c'est le cas, je pense que cette notation est preferable.</citation>
+Oui, tu as bien compris. En effet, ma notation n'est pas rigoureuse d'un point de vue mathématique, mais elle est plus simple (d'autant plus que je préfère ne pas me baser sur les notations mathématiques des intervalles et des ensembles, que l'on ne voit qu'au lycée ; or, Vieux sait combien de collégiens sont sur le SdZ). Tu ne la trouves pas suffisamment claire ?
+Au début j'avais mis comme on voit un peu partout, c'est-à-dire "de <math>-3,4 \times 10^{38}</math> à <math>+3,4 \times 10^{38}</math>", mais finalement cette information ne renseignait que sur le plus grand nombre possible en valeur absolue, et ne dit pas quel est le nombre le plus proche de zéro possible (vu qu'avec le bit de signe, c'est totalement symétrique).
+Ne t'en déplaise, je préfère garder ma notation actuelle (à moins que tu ne la trouves vraiment pas claire). Je l'utilise à plusieurs reprises (dans les autres tableaux, et peut-être ailleurs, je ne m'en souviens plus). À la rigueur, je peux rajouter une remarque (encore une !) pour le lecteur pour lui dire que dorénavant, j'emploierai <math>\pm</math> un peu partout pour faire quelque chose de général, le signe dépendant du bit de signe.
+
+
+En tout cas, merci de ton attention. :)</citation>
+
+
+
+<citation nom="Adroneus"><citation rid="6403729">Mmmh, si tu veux.</citation>
+C'est fou ce que tu as l'air convaincu par l'idee ^^
+Si je dis ca c'est parce que je pense que je trouve ca plus clair, le choix t'appartient.
+<citation rid="6403729">Non, le préfixe 0b est une convention d'écriture pour indiquer que le nombre qui suit est écrit en binaire</citation>
+Oui je m'en doutais mais je ne l'avais jamais vue avant =) Je pense qu'il serait bien que tu le precise quelque part.
+<citation rid="6403729">Tu crois vraiment ? Dans le tuto je me base sur le fait que le lecteur maîtrise déjà le binaire... Ou alors je le mets en secret ? Qu'en penses-tu ?</citation>
+C'est comme tu veux, si comme tu le dis au debut de ton tuto, tu te base sur le fait que le lecteur connaisse le binaire alors non, ce n'est pas utile. Sinon tu peux le mettre en secret pour que les debutants mais curieux puissent suivre sans etre trop perturbes =)
+
+<citation rid="6403729">Ne t'en déplaise, je préfère garder ma notation actuelle (à moins que tu ne la trouves vraiment pas claire).</citation>
+Entendu =) .Moi elle ne me derange pas, comme je l'ai comprise on peut dire qu'elle est suffisamment claire (je voulais juste verifier si j'avais bien compris ou pas ;) )
+
+P.S: j'ai edite mon precedent message ;)</citation>
+
+
+
+<citation nom="Duarna">J'ai parcouru rapidement le tutoriel, je ne trouve pas ça très clair comme notation. Elle est compréhensible, mais je la trouve pas immédiate. Pourquoi ne pas séparer plus petit/plus grand dans deux colonnes et parler de limites de taille en valeur absolue ? </citation>
+
+
+
+<citation nom="Maëlan"><citation rid="6403608">je vois un <minicode type="c">bool</minicode>, je suppose donc que tu codes suivant la norme C99, tu dois inclure <minicode type="c">stdbool.h</minicode> pour utiliser ce type.</citation>
+Flûte, ça, c'est un détail qui m'avait échappé (j'avais finalement décidé de ne pas utiliser <minicode type="c">bool</minicode>). C'est corrigé.
+
+
+<citation rid="6403608">Je ne sais pas si ton tutoriel s'adresse a des zeros ou pas, car si c'est le cas, tu ne devrais pas declarer tes variables apres un branchement conditionnel. Etant donne que l'on apprend a coder en suivant la norme C89 dans le tuto de M@téo21, cela pourrait en destabiliser certains.</citation>
+Tu as sans doute raison, je vais améliorer ça je pense.
+Toutefois, il faudra que les Zér0s qui arrivent fraichement du tuto officiel se fassent une raison, car par la suite j'utilise plusieurs fonctionnalités du C99 (<minicode type="c"><stdint.h></minicode> étant la plus importante). J'ai d'ailleurs écrit une remarque là-dessus, comme tu le verras. Mais autant ne pas compliquer davantage, et plaçons les déclarations au début. ^^ 
+
+
+<citation rid="6403842">J'ai parcouru rapidement le tutoriel, je ne trouve pas ça très clair comme notation. Elle est compréhensible, mais je la trouve pas immédiate. Pourquoi ne pas séparer plus petit/plus grand dans deux colonnes et parler de limites de taille en valeur absolue ?</citation>
+J'ai finalement suivi ton idée et j'ai édité le tuto (enfin juste le 1er tableau). Si tu pouvais me dire ce que tu en penses ?
+En revanche, je ne toucherais pas aux 2 autres tableaux (ils sont déjà assez gros comme ça, et de toutes façons je pense que les crochets dans le binaire et l'hexa sont assez explicites. :) 
+
+<gras>@ Adroneus</gras> : Finalement, j'ai fait ce que tu as proposé (concernant les constantes <minicode type="c">0</minicode>), et tu avais raison ça fait mieux comme ça. :) 
+
+Par ailleurs, j'ai commencé à aérer le texte et à supprimer des balises <minicode type="zcode"><information></minicode>. J'ai déjà traité les deux premières parties. Effectivement, certaines étaient superflues.</citation>
+
+
+
+<citation nom="Duarna">Je trouve ça bien maintenant. Le deuxième tableau est assez clair aussi, puisqu'il s'agit d'une deuxième passe sur des informations de ce genre.
+
+J'ai cependant une autre idée : pourquoi ne pas glisser une phrase expliquant que la représentation des négatifs est de toute façon parfaitement symétrique et se contenter d'indiquer des plages de valeurs pour les positifs ? Ça permet d'alléger l'écriture en enlevant le symbole ± .
+
+Autre petit soucis : dans le deuxième tableau, deuxième ligne, ± ∞, le symbole ∞ m'apparait décalé par rapport à ± . Un soucis de mon navigateur où c'est général ? </citation>
+
+
+
+<citation nom="Adroneus">C'est general, tu n'utilises pas les balises Tex Maelan44?
+
+Et effectivement, je trouve ca mieux comme ca =) </citation>
+
+
+
+<citation nom="Maëlan"><citation rid="6404150">dans le deuxième tableau, deuxième ligne, ± ∞, le symbole  ∞ m'apparait décalé par rapport à ± . Un soucis de mon navigateur où c'est général ?</citation>C'est normal, j'ai agrandi sa taille, sinon il était tout petit et presque illisible. J'aurais pu utilsier Tex mais ça aurait fait un fond blanc tout moche. >_< 
+
+<souligne>ÉDIT:</souligne> J'ai trouvé une meilleure solution : en laissant le caractère à sa taille normale, mais en changeant la police d'écriture pour "<italique>Times</italique>".
+Et en fait, le Tex ne fait pas de fond blanc comme je le croyais...
+
+
+
+<citation rid="6404180">C'est general, tu n'utilises pas les balises Tex Maelan44?</citation>
+Ben, lorsqu'il y a un caractère Unicode pour ce que je veux (par exemple le <math>\pm</math> ou <math>\infty</math>) je préfère éviter ; je trouve que ça s'intègre mieux au texte, contrairement à Tex qui fait ressortir le tout. Pour les expressions simples (dont les nombres tous seuls en écriture scientifique), et en particulier pour des exemples (par exemple <math>42.1337</math>), je préfère utiliser du texte plein pour ne pas trop les mettre en relief.
+Pourquoi, c'est mal ?
+
+Je réserve plutôt Tex pour les calculs et les relations (cf partie 3).
+
+
+
+Sinon, je lâche une de mes propres critiques : les titres de mes parties / sous-parties ne sont pas toujours géniaux, je n'ai pas été inspiré (en particulier celui de la 3è partie, "Allons plus loin", qui ne veut rien dire). Donc si vous aviez des idées pour les améliorer, je suis preneur. :)
+
+
+
+Enfin, en même temps que j'aère, je mets en alignement justifié (j'étais jusque là convaincu que le zCode ne proposait pas cet alignement !).</citation>
+
+
+
+<citation nom="Adroneus"><citation rid="6404237">Pourquoi, c'est mal ?</citation>
+Ah non non =)
+
+Je vais regarder tes titres (j'ai pas fait attention lors de la lecture ;)</citation>
+
+
+
+<citation nom="Maëlan"><italique>A y est</italique>, j'ai fini d'aérer. J'ai également supprimé certaines balises <minicode type="zcode"><information></minicode> qui sont intégrées directement dans le texte.
+Maintenant, pensez-vous que ce soit assez aéré et débarrassé de ces balises ?
+Et autre question : devrais-je aussi aérer les codes ?
+
+Par rapport à ta remarque sur le C99 : j'ai finalement laissé le code tel quel, et j'ai rajouté une remarque en-dessous pour dire qu'on utilise le C99 (parce qu'on sera obligé par la suite) et qu'on a le droit de faire ça. Eh oui ça refait une balise <minicode type="zcode"><information></minicode> en plus...
+
+J'ai également ajouté des précisions concernant les types de <minicode type="c"><stdint.h></minicode>, au cas ou le Zér0 ne connaitrait pas.
+
+Plus quelques détails mineurs...</citation>
+
+
+
+<citation nom="Adroneus">J'ai pas relu, dans tes sources : Tu ne cites pas la norme C99 mais le draft de la norme ;) (comment ca j'ecrase les mouches avec un tractopelle?)</citation>
+
+
+
+<citation nom="Maëlan">Oui, bon hein !
+C'est corrigé. :D</citation>
+
+
+
+<citation nom="yoch">Salut,
+
+Le tuto est très instructif :) . Pas eu la force de tout lire, je continuerais plus tard.
+
+Une petite remarque : il me semble que les parties soulignées en rouge sont erronées.
+
+<citation nom="liste des nombres dénormalisés et premiers nombres normalisés (pour un float)">
+0b 0,00000000000000000000000 ×2-126 // zéro
+0b 0,00000000000000000000001 ×2-126 // 1er nombre dénormalisé
+0b 0,000000000000000000000<couleur nom="rouge">01</couleur> ×2-126 // nombre dénormalisé suivant
+…
+0b 0,11111111111111111111111 ×2-126 // dernier nombre dénormalisé
+0b 1,00000000000000000000000 ×2-126 // 1er nombre normalisé
+0b 1,0000000000000000000000<couleur nom="rouge">0</couleur> ×2-126 // nombre normalisé suivant
+…
+0b <couleur nom="rouge">0</couleur>,11111111111111111111111 ×2-126 // dernier nombre normalisé de cet exposant
+</citation>
+
+Remarque générale : peut être que des exemples des problèmes pouvant survenir seraient intéressants. Par exemple, tu mentionne le problème des nombres significatifs. Tu pourrais montrer facilement que ça peut conduire à des résultats aberrants, voire même à une boucle infinie...
+<code type="c">
+4.2e20==4.2e20+1.0;  /* TRUE */
+</code>
+
+<gras>EDIT:</gras>
+
+Tu peux mentionner qu'il existe un wrning pour prévenir si l'utilisateur fait des comparaisons d'égalité sur des flottants : <minicode type="console">-Wfloat-equal</minicode>
+
+La methode que tu présente à la fin pour comparer des flottants (comparer la représentation entière) est problématique, pour 3 raisons :
+<barre>1. tu utilise des <minicode type="c">int</minicode>, or rien ne te permet d’être sûr que <minicode type="c">int</minicode> suffit pour un <minicode type="c">double</minicode>, tu devrais plutôt utiliser des <minicode type="c">long unsigned int</minicode>.</barre>
+2. avec des long double, tu vas avoir des soucis de toute façon.
+<barre>3. je n'en suis pas sûr, mais il me semble que tu risque d'avoir des soucis si l'un des deux nombre vaut NaN et l'autre vaut le plus grand nombre représentable (enfin, ça dépend quel NaN, disons s'il existe un tel NaN juste au dessus, je n'en sais trop rien).</barre>
+<taille valeur="tpetit">(1 : mal lu, ces problèmes sont gérés dans le code, je n'avais lu que l'explication; 3 : le point est abordé plus bas)</taille>
+
+<titre2>Orthographe :</titre2>
+- Si c'était juste pour ce détail, <barre><couleur nom="rouge">s</couleur></barre><couleur nom="vertf">c</couleur>e serait superflu
+- Toutefois, il existe une autre manière de faire, plus pratique mais un <couleur nom="vertf"><gras>peu</gras></couleur> plus hard
+
+<gras>EDIT 2:</gras>
+Pour la fin, on peut mentionner par exemple que l'option d'optimisation pour GCC <minicode type="console">-ffast-math</minicode>, censée accélérer les calculs sur flottants, entraine un non-respect partiel de IEEE 754. (cf. <lien url="http://gcc.gnu.org/onlinedocs/gcc-4.1.1/gcc/Optimize-Options.html">ici</lien>. Et puis, je viens de tomber sur <lien url="http://gcc.gnu.org/ml/gcc/2001-07/msg02150.html">cette perle</lien>).
+
+<citation nom="tuto">Cependant, le contraire n'est pas vrai ! Vous pouvez parfaitement avoir une implémentation qui suit IEEE 754 mais qui ne définit pas cette constante. C'est notamment le cas de GCC, en particulier sous Windows.</citation>
+Je penche plus pour un bug de MinGW qu'une accusation de GCC en général. Sous Linux, la macro est bien déclarée.
+(ou bien MinGW ne suit pas complètement IEEE 754, ce qui est possible vu qu'il utilise certaines fonctions du runtime C de Windows datant de plus de 10 ans :-° ).
+
+<citation nom="Taurre - tuto">visiblement, GCC ne définit pas la macroconstante __STDC_IEC_559__, mais laisse cette définition à la bibliothèque C du système. Or, comme celle de Windows ne supporte pas le C99… :-°</citation>
+Ça ne veut rien dire. Les macros ne sont pas définies par les bibliothèques, mais dans les headers (en principe), ou directement par le compilo (je crois).
+
+Pour le code de test afin de savoir quelle est l'implémentation utilisée par le système, c'est techniquement intéressant, mais à bannir en pratique, je pense. Mieux vaut apprendre aux gens à chercher eux-même ce genre d'information.
+Qui plus est, c'est incorrect : le test ne vérifie que la représentation mémoire, non toutes les règles définies pour les diverses opérations, ce qui est une part non  négligeable.
+
+<gras>Enfin, une critique générale</gras> : le tuto n'entre pas assez à mon goût dans le domaine de l'architecture matérielle. Exemple : il me semble (corrigez moi si je dis des bêtises) qu'en réalité la représentation mémoire des flottants dépend essentiellement du <acronyme valeur="Floating Point Unit">FPU</acronyme>. En effet, je vois mal un compilo décider de se passer de cette unité processeur et de réécrire toutes les opérations sur les flottants. Est-ce le cas ?
+
+<gras>EDIT 4:</gras>
+Certains tableaux s'affichent mal chez moi (Firefox 4) :
+<secret>
+<image>http://uploads.siteduzero.com/files/323001_324000/323842.png</image>
+<image>http://uploads.siteduzero.com/files/323001_324000/323841.png</image></secret></citation>
+
+
+
+<citation nom="mewtow"><citation rid="6406088"><gras>Enfin, une critique générale</gras> : le tuto n'entre pas assez à mon goût dans le domaine de l'architecture matérielle. Exemple : il me semble (corrigez moi si je dis des bêtises) qu'en réalité la représentation mémoire des flottants dépend essentiellement du <acronyme valeur="Floating Point Unit">FPU</acronyme>. En effet, je vois mal un compilo décider de se passer de cette unité processeur et de réécrire toutes les opérations sur les flottants. Est-ce le cas ?</citation>
+
+Pour moi, l'auteur a plutôt bien fait. Si on se met à parler de ça, entre les processeurs spécialisés qui ne respectent pas IEE754, les processeurs avec plusieurs FPU différentes et les processeurs qui n'utilisent qu'un seul format de flottant en interne...
+
+Le format des flottants dépend du compilateur : celui-ci peut utiliser un autre format de flottants. Il existe des processeurs qui utilisent des formats de flottants bizarres pas compatibles avec la norme IEE754 : dans ce cas la FPU impose un format de flottant différent. Mais c'est une situation rare. Sans compter que le compilateur peut faire pire : émuler les flottants sans passer par la FPU. Tu peux ainsi forcer le respect d'un format de flottant (la norme IEE754, par exemple) sur un processeur qui ne le gère pas, pour améliorer la compatibilité. Je ne sais pas si ça se fait chez les compilateurs, mais les programmeurs d'émulateurs ne se gênent pas, eux !
+
+Quand à la représentation mémoire des flottants sur un système compatible IEE754, elle dépend un peu de la FPU ET du jeu d'instruction mais n’en est pas complètement dépendante. Par exemple, sur les anciens processeurs x86 (avant le SSE et autres jeux d'instructions du genre), les unités de calcul sur flottants (x87) travaillaient sur des flottants double précision étendue et rien d'autre. 
+
+Dans un cas pareil, si le processeur n'offre rien d'autre, tu peux faire respecter la norme IEE754 quand même, en utilisant des conversions flottant 32/64 bits -> 80bits. Ces conversions peuvent être programmés par le compilateur/programmeur, ou être faites en matériel. Les processeurs x86 disposent d'instructions capable de charger un flottant 32/64 bits dans un registre et qui s'occupent d'en faire la conversion en flottant 80bits. De même, lors de l'écriture d'un flottant d'un registre vers la mémoire, celui-ci est convertit du format 80bits en son format de base (simple ou double précision) lors de son écriture (grâce à des instructions spécialisées). Et ces processeurs sont compatibles IEE754.
+
+En clair, le format des flottants est un peu décorrélé de la FPU, le tout est que celle-ci gère au moins un format de flottant avec des arrondis et des calculs compatibles IEE754. Mais la norme IEE754 se moque de la façon dont son faits les calculs en interne.
+
+---------------------------------------------------------------------
+
+Sinon, concernant le tutoriel, tu pourrais rajouter un truc dans la partie sur les arrondis : certains instructions sont de vraie usines à arrondis : les additions et soustractions par exemple. D'autres sont plus sages : multiplications et divisions. En cherchant bien, tu pourrais surement déduire l’explication de ce fait avec les informations données dans ton tutoriel.
+
+EDIT : je vois que tu as rajouté mon détail dans ton tutoriel mais en précisant que ce n'était pas vérifié. C'est une bonne chose. 
+Voici ma source : <lien url="http://www.codeproject.com/KB/recipes/float_point.aspx">Five tips for floating point coding</lien>.</citation>
+
+
+
+<citation nom="Maëlan">Déjà, merci <gras>yoch</gras> de ta lecture attentive. :)
+
+<secret><citation rid="6406088">Une petite remarque : il me semble que les parties soulignées en rouge sont erronées.</citation>
+C'est vrai, je l'avais remarqué et corrigé hier soir.
+
+<citation rid="6406088">Certains tableaux s'affichent mal chez moi (Firefox 4)</citation>
+Ça ne vient pas de ton navigateur, et ils s'affichent parfaitement. En fait, il s'agit d'un bogue de l'éditeur : dès que j'ouvre cette partie pour l'éditer, les lignes d'en-tête des tableaux sont échangées. Je dois les remettre dans le bon ordre à chaque fois, et il m'arrive d'oublier. :-°
+
+D'ailleurs, tu lisais le tutoriel en même temps que tu éditais ton message ? Parce que j'avais corrigé ces 2 problèmes hier soir...</secret>
+
+<secret><citation rid="6406088">Remarque générale : peut être que des exemples des problèmes pouvant survenir seraient intéressants. Par exemple, tu mentionne le problème des nombres significatifs. Tu pourrais montrer facilement que ça peut conduire à des résultats aberrants, voire même à une boucle infinie...
+<code type="c">
+4.2e20==4.2e20+1.0;  /* TRUE */
+</code></citation>
+Tu as raison, je reste trop théorique (mais j'en parle plus ou moins dans la 4è partie). Je vais essayer d'ajouter des exemples concrets.
+
+<citation rid="6406196">Sinon, concernant le tutoriel, tu pourrais rajouter un truc dans la partie sur les arrondis : certains instructions sont de vraie usines à arrondis : les additions et soustractions par exemple. D'autres sont plus sages : multiplications et divisions. En cherchant bien, tu pourrais surement déduire l’explication de ce fait avec les informations données dans ton tutoriel.</citation>
+Je vais y réfléchir aussi. C'est vrai que je suis resté vague sur cette partie.</secret>
+
+<secret>
+<citation rid="6406088">Tu peux mentionner qu'il existe un warning pour prévenir si l'utilisateur fait des comparaisons d'égalité sur des flottants : <minicode type="console">-Wfloat-equal</minicode></citation>
+Merci pour l'information. :) </secret>
+
+<secret><citation rid="6406088"><titre2>Orthographe :</titre2>
+- Si c'était juste pour ce détail, <barre><couleur nom="rouge">s</couleur></barre><couleur nom="vertf">c</couleur>e serait superflu
+- Toutefois, il existe une autre manière de faire, plus pratique mais un <couleur nom="vertf"><gras>peu</gras></couleur> plus hard</citation>
+Je vais corriger ça de ce pas !</secret>
+
+<secret><citation rid="6406088">Pour la fin, on peut mentionner par exemple que l'option d'optimisation pour GCC <minicode type="console">-ffast-math</minicode>, censée accélérer les calculs sur flottants, entraine un non-respect partiel de IEEE 754. (cf. <lien url="http://gcc.gnu.org/onlinedocs/gcc-4.1.1/gcc/Optimize-Options.html">ici</lien>. Et puis, je viens de tomber sur <lien url="http://gcc.gnu.org/ml/gcc/2001-07/msg02150.html">cette perle</lien>).</citation>
+Je vais voir ça.</secret>
+
+<secret><citation rid="6406088"><citation nom="tuto">Cependant, le contraire n'est pas vrai ! Vous pouvez parfaitement avoir une implémentation qui suit IEEE 754 mais qui ne définit pas cette constante. C'est notamment le cas de GCC, en particulier sous Windows.</citation>
+Je penche plus pour un bug de MinGW qu'une accusation de GCC en général. Sous Linux, la macro est bien déclarée.
+(ou bien MinGW ne suit pas complètement IEEE 754, ce qui est possible vu qu'il utilise certaines fonctions du runtime C de Windows datant de plus de 10 ans :-° ).</citation>
+Je pense que la réponse se trouve juste en dessous, non ?
+
+<citation rid="6406088"><citation nom="Taurre - tuto">visiblement, GCC ne définit pas la macroconstante __STDC_IEC_559__, mais laisse cette définition à la bibliothèque C du système. Or, comme celle de Windows ne supporte pas le C99… :-°</citation>
+Ça ne veut rien dire. Les macros ne sont pas définies par les bibliothèques, mais dans les headers (en principe), ou directement par le compilo (je crois).</citation>
+C'est le terme employé "bibliothèques" qui te gêne, c'est ça ? Dans ce cas je le remplace par "headers".</secret>
+
+<secret><citation rid="6406088">Pour le code de test afin de savoir quelle est l'implémentation utilisée par le système, c'est techniquement intéressant, mais à bannir en pratique, je pense. Mieux vaut apprendre aux gens à chercher eux-même ce genre d'information.</citation>Ça faisait aussi partie de mes auto-critiques. Je me demandais s'il fallait livrer ou non un code "clé en main", prêt à être copié-collé ; la même question se pose pour le code final pour comparer les flottants.
+
+<citation rid="6406088">Qui plus est, c'est incorrect : le test ne vérifie que la représentation mémoire, non toutes les règles définies pour les diverses opérations, ce qui est une part non  négligeable.</citation>
+C'est vrai, mais je n'ai pas détaillé les opérations sur les flottants dans ce tuto.
+D'ailleurs, à propos de ce code (qui n'est pas encore certain), j'avais posé une question sur <lien url="http://www.siteduzero.com/forum-83-663077-6404337-les-nombres-a-virgule-flottante-du-point-de-vue-de-la-norme.html">ce topic</lien> du forum C (auquel tu as participé).</secret>
+
+<citation rid="6406088"><gras>Enfin, une critique générale</gras> : le tuto n'entre pas assez à mon goût dans le domaine de l'architecture matérielle. Exemple : il me semble (corrigez moi si je dis des bêtises) qu'en réalité la représentation mémoire des flottants dépend essentiellement du <acronyme valeur="Floating Point Unit">FPU</acronyme>. En effet, je vois mal un compilo décider de se passer de cette unité processeur et de réécrire toutes les opérations sur les flottants. Est-ce le cas ?</citation>
+Je vais laisser le débat avec <gras>mewtow</gras> se dérouler. :-° Personnellement, je trouve que ce tuto est déjà bien assez long et théorique, et que ce sujet plutôt difficile pourrait faire l'objet d'un tuto à part (s'il y a suffisamment à dire).
+
+
+
+<souligne>ÉDIT:</souligne> Je viens de remanier la partie IV ("Inconvénients des nombres flottants") pour des raisons de forme et pour y intégrer certaines de vos remarques (l'option -Wfloat-equal, exemples, arrondis selon les différentes opérations mais je n'ai pas encore fini ce point).</citation>
+
+
+
+<citation nom="mewtow">je vois que tu as rajouté mon détail dans ton tutoriel mais en précisant que ce n'était pas vérifié : c'est une bonne chose. 
+Voici ma source, au cas où : <lien url="http://www.codeproject.com/KB/recipes/float_point.aspx">Five tips for floating point coding</lien>.
+
+Sinon, dans la partie sur les défauts des flottants, tu peux aussi préciser que les opérations avec les flottants ne sont pas associatives : l'ordre dans lequel on fait un calcul change de résultat. Par exemple : 1 - (0.2 + 0.2 + 0.2 + 0.2) aura un résultat différent de ((((1-0.2)-0.2)-0.2)-0.2). Et oui, je te demande de rajouter quelques chose alors que le tutoriel est vraiment en train de gonfler.
+
+Ce qui m’amène à te donner un dernier conseil, très important : ton mini-tutoriel devrait devenir un big-tutoriel. 
+
+Pourquoi ? Et bien Parce que ton tutoriel est vraiment énorme, bien trop pour un mini-tutoriel ! Je crois que ça va s'impose vu tout le boulot que tu as fais.</citation>
+
+
+
+<citation nom="yoch"><citation rid="6406424"><citation rid="6406088">Pour le code de test afin de savoir quelle est l'implémentation utilisée par le système, c'est techniquement intéressant, mais à bannir en pratique, je pense. Mieux vaut apprendre aux gens à chercher eux-même ce genre d'information.</citation>Ça faisait aussi partie de mes auto-critiques. Je me demandais s'il fallait livrer ou non un code "clé en main", prêt à être copié-collé ; la même question se pose pour le code final pour comparer les flottants.</citation>
+Non, on ne s'est pas compris. ;) Je n'ai rien contre ton code de comparaison, ni contre le fait de donner un code abondamment détaillé et "créé pas-à-pas" aux gens. Simplement je trouve que ce code est une mauvaise solution. Ce que je veux dire par "chercher eux-même ce genre d'information", c'est de savoir trouver si le compilateur/plate forme cible supporte bien la norme ou non. Bref, je ne vois pas l'utilité de faire la vérification dynamiquement, et je trouve cela contre éducatif (même si c'est techniquement intéressant :) ).
+
+<citation rid="6406424"><citation rid="6406088"><gras>Enfin, une critique générale</gras> : le tuto n'entre pas assez à mon goût dans le domaine de l'architecture matérielle. Exemple : il me semble (corrigez moi si je dis des bêtises) qu'en réalité la représentation mémoire des flottants dépend essentiellement du <acronyme valeur="Floating Point Unit">FPU</acronyme>. En effet, je vois mal un compilo décider de se passer de cette unité processeur et de réécrire toutes les opérations sur les flottants. Est-ce le cas ?</citation>
+Je vais laisser le débat avec <gras>mewtow</gras> se dérouler. :-° Personnellement, je trouve que ce tuto est déjà bien assez long et théorique, et que ce sujet plutôt difficile pourrait faire l'objet d'un tuto à part (s'il y a suffisamment à dire).</citation>
+Non, je ne cherche pas spécialement à débattre ce sujet que je connais peu. Je m'interrogeais simplement sur ce point, qui reste selon moi assez lié à l'objet du tuto. Le fait qu'un compilo <souligne>puisse</souligne> émuler le FPU ne change pas vraiment la donne : en pratique, ce n'est généralement pas le cas. Un petit mot sur le sujet ne devrait pas nuire à l'ensemble, toujours selon moi.
+
+Sinon, encore bravo pour ton tuto que j'ai lu avec grand plaisir ! :) 
+
+<gras>EDIT :</gras>
+<citation rid="6406196">Quand à la représentation mémoire des flottants sur un système compatible IEE754, elle dépend un peu de la FPU ET du jeu d'instruction mais n’en est pas complètement dépendante. Par exemple, sur les anciens processeurs x86 (avant le SSE et autres jeux d'instructions du genre), les unités de calcul sur flottants (x87) travaillaient sur des flottants double précision étendue et rien d'autre.
+</citation> 
+Encore une fois, je ne suis absolument pas un expert (ni même un amateur éclairé) en la matière, mais sur wikipédia je lis cela :
+<citation nom="Wikipédia : Intel 8087">Les 8087 fournissaient deux types de données de base en virgule flottante en 32/64 bits et un support interne étendu aux données 80 bits pour améliorer la précision sur de gros calculs grands et complexes. Indépendamment de ceci, les 8087 offraient un format 80 bits à 17 chiffres emballé dans le BCD et un format de donnée 16,32 et 64 bits dans les entiers.</citation>
+
+<citation rid="6406196">En clair, le format des flottants est un peu décorrélé de la FPU, le tout est que celle-ci gère au moins un format de flottant avec des arrondis et des calculs compatibles IEE754. Mais la norme IEE754 se moque de la façon dont son faits les calculs en interne.</citation>
+C'est clair que la norme se moque, au final, de comment sont effectuées les calculs. Mais il me semble clair que ladite norme a en partie été pensée pour répondre à des questions d'implémentation. Ce serait dommage de l'ignorer, non ?
+
+Je cite (encore une fois) Wikipédia :
+<citation nom="Wikipédia">The IEEE Standard for Floating-Point Arithmetic (IEEE 754) is a technical standard established by the Institute of Electrical and Electronics Engineers (IEEE) and the most widely used standard for floating-point computation, <gras>followed by many hardware (CPU and FPU) and software implementations</gras>.</citation>
+<citation nom="Wikipédia">Quand Intel conçut les 8087, il visait à en faire un format standard de virgule flottante pour de futures puces. <gras>En fait, une des choses les plus réussies de ce coprocesseur d'un point de vue historique était l'introduction de la première norme de virgule flottante pour les PC à base de x86 : l'IEEE 754</gras> (cependant l'Intel 8087 n'implémentait le standard IEEE 754 dans tous ses détails, comme le standard n'était pas complètement définit jusqu'en 1985 ; le premier coprocesseur Intel qui l'implémenta complètement fut le 80387)...</citation></citation>
+
+
+
+<citation nom="Maëlan"><citation rid="6407083">je vois que tu as rajouté mon détail dans ton tutoriel mais en précisant que ce n'était pas vérifié : c'est une bonne chose. 
+Voici ma source, au cas où : <lien url="http://www.codeproject.com/KB/recipes/float_point.aspx">Five tips for floating point coding</lien>.</citation>
+Merci pour le lien ! :) C'est une véritable mine d'or.
+<citation rid="6407083">Sinon, dans la partie sur les défauts des flottants, tu peux aussi préciser que les opérations avec les flottants ne sont pas associatives : l'ordre dans lequel on fait un calcul change de résultat. Par exemple : 1 - (0.2 + 0.2 + 0.2 + 0.2) aura un résultat différent de ((((1-0.2)-0.2)-0.2)-0.2).</citation>
+Excellente idée. C'est même essentiel.
+
+
+<citation rid="6407579">Non, on ne s'est pas compris. ;) Je n'ai rien contre ton code de comparaison, ni contre le fait de donner un code abondamment détaillé et "créé pas-à-pas" aux gens. Simplement je trouve que ce code est une mauvaise solution. Ce que je veux dire par "chercher eux-même ce genre d'information", c'est de savoir trouver si le compilateur/plate forme cible supporte bien la norme ou non. Bref, je ne vois pas l'utilité de faire la vérification dynamiquement, et je trouve cela contre éducatif (même si c'est techniquement intéressant :) ).</citation>
+Autant pour moi.
+Dans ce cas, que penses-tu de ne pas donner de code, mais de fournir des pistes amenant à ce que j'ai fait et/ou à ce que j'ai proposé dans l'autre topic (les constantes de <float.h>), tout en renvoyant les Zér0s à la documentation de leur compilo ?
+Cependant, si on se base sur les constantes de <float.h>, ce sera du statique et non du dynamique, et ce sera indépendant du compilateur ("portabilité" du code).
+
+Par rapport au <citation rid="6407579">techniquement intéressant :) </citation>, j'avais pensé à mettre des exercices du style "coder des macros ou fonctions <minicode type="c">isnan</minicode>, <minicode type="c">isinf</minicode>...", mais je ne l'ai finalement pas mis. On pourrait recycler le code actuellement en place en un exercice de ce genre, non ? (ça, c'est dans le cas où on fait un big-tuto, voir plus bas)
+
+
+
+<titre2>Big-tuto ?</titre2>
+<citation rid="6407083">Et oui, je te demande de rajouter quelques chose alors que le tutoriel est vraiment en train de gonfler.
+Ce qui m’amène à te donner un dernier conseil, très important : ton mini-tutoriel devrait devenir un big-tutoriel. 
+Pourquoi ? Et bien Parce que ton tutoriel est vraiment énorme, bien trop pour un mini-tutoriel ! Je crois que ça va s'impose vu tout le boulot que tu as fais.</citation>
+C'est vrai qu'il est très long, mais je ne vois pas de quoi en faire un big-tuto. Ou alors (au choix)...
+<liste>
+<puce>il n'y aurait que 3 chapitres courts (le minimum quoi).</puce>
+<puce>on fusionne avec d'autres tutoriels sur le même thème (genre celui "le vrai visage des variables" par exemple) ; mais il faut que leurs auteurs soient d'accord.</puce>
+<puce>on rajoute le maximum qu'on peut dire sur le sujet (donc toutes ces histoires de processeurs) en détaillant bien. J'avais encore une liste dans mon brouillon des ajouts possibles à évoquer, mais que je n'ai pas mis parce que ça en faisait trop (ce que j'ai mis en gras est à mes yeux le plus important) :<liste>
+<puce><gras>détailler les histoires de calculs</gras> (ce que je suis en train de faire finalement sur les conseils de mewtow) ; j'avais davantage mis l'accent sur les comparaisons</puce>
+<puce>rajouter des exercices (voir plus haut)</puce>
+<puce>évoquer les autres formats de la norme IEEE 754 (précisions étendues notamment)</puce>
+<puce>évoquer les autres modes de représentation (c.-à.-d. non-IEEE)</puce>
+<puce>l'environnement des nombres à virgule flottante fourni par <fenv.h></puce>
+</liste>Mais pour l'instant, je ne me sens ni le courage ni la capacité de le faire (d'autant plus que je m'absenterais à partir de mardi ou mercredi :-° ).</puce>
+</liste>
+
+
+
+En tous cas, je vous remercie de tout le temps que vous accordez à mon tuto (hier <gras>Adroneus</gras>, aujourd'hui <gras>yoch</gras> et <gras>mewtow</gras>) !</citation>
+
+
+
+<citation nom="yoch"><citation rid="6408295">Dans ce cas, que penses-tu de ne pas donner de code, mais de fournir des pistes amenant à ce que j'ai fait et/ou à ce que j'ai proposé dans l'autre topic (les constantes de <float.h>), tout en renvoyant les Zér0s à la documentation de leur compilo ?</citation>
+Le code ne me dérange absolument pas. Perso, je le regarde comme une curiosité "techniquement intéressante". Simplement je l'aurais mis en avant comme tel, plutôt que comme une solution valable, et j'aurais clairement orienté le lecteur vers d'autres voies.
+
+Pour ce qui est des suggestions que tu mentionnes, je crois effectivement qu'ajouter une partie sur les opérations serait un réel plus (même quitte à alléger la dernière partie). Par contre, en faire un big-tuto, hum, je ne sais pas...
+
+<citation rid="6408295">En tous cas, je vous remercie de tout le temps que vous accordez à mon tuto (hier <gras>Adroneus</gras>, aujourd'hui <gras>yoch</gras> et <gras>mewtow</gras>) !</citation>
+C'est que ton tuto le vaut bien ;)</citation>
+
+
+
+<citation nom="mewtow">Crois-moi, en regroupant bien tes parties, tu pourrais avoir un big tutoriel digne de ce nom : ton tutoriel fait 23 pages quand je l'exporte en PDF ! Si ça vaut pas un big-tutoriel, je sait pas ce qu'il faut.
+
+Sinon, la partie Allons plus loin pourrait être renommée Arithmétique flottante.
+
+Pour ces histoires de processeurs, regardez ici : 
+<lien type="wikipedia" url="X87" langue="en">FPU x87 : pour cette histoire de traitement en 80 bits en interne</lien>
+<lien url="http://wiretap.area.com/Gopher/Library/Techdoc/Cpu/coproc.txt">Co-processors and floating point</lien>
+
+Faudra aussi se renseigner sur les jeux d’instructions SSE et SSE2/3 qui gèrent le tout différemment.
+
+Dans le lien au dessus, il y est écrit : 
+<citation nom="X87 wikipédia">A given sequence of arithmetic operations may thus behave slightly differently compared to a strict single-precision or double-precision IEEE 754 FPU[1]. This may sometimes be problematic for some semi-numerical calculations relying on knowledge of exact FPU precision for correct operation. To avoid such problems, the x87 can be configured via a special configuration/status register to automatically round to single or double precision after each operation.</citation>
+
+Le seul problème, c'est que ces arrondis ne donnent pas vraiment des résultats vraiment identiques à ce qu'impose la norme IEE754 ! En clair, IEE754 supporté par les processeurs x86-32 grâce à la FPU x87, certes, mais c'est un support fait à la truelle ! 
+
+Sinon, voici un lien pour pour ce qui concerne le respect de la norme IEE754 et les erreurs de calculs au niveau du matériel. Il me semble que ce PDF nous apprend que sans intervention du programmeur/compilateur, notre hardware a un support pourri de la norme IEE754 : <lien url="http://hal.archives-ouvertes.fr/docs/00/28/14/29/PDF/floating-point-article.pdf">Pitfalls of floating point calculus and hardwares implementations of IEE754</lien>
+
+Il y a de quoi écrire un roman si Maelan44 veut vraiment faire une partie sur nos histoires de processeurs ! Je comprendrais aprfaitement que celui ne veuille pas parler de tout ça.</citation>
+
+
+
+<citation nom="Maëlan"><citation rid="6408481">Crois-moi, en regroupant bien tes parties, tu pourrais avoir un big tutoriel digne de ce nom : ton tutoriel fait 23 pages quand je l'exporte en PDF !</citation>
+ o_O !
+Il ne doit pas y avoir beaucoup sur une page quand même (pourrais-tu me l'envoyer, je suis curieux ?).
+<secret>Comment fais-tu pour l'avoir en PDF ? Tu passes par une extension de ton navigateur ?</secret>
+
+<citation rid="6408481">Sinon, la partie Allons plus loin pourrait être renommée Arithmétique flottante.</citation>
+Idée intéressante, je retiens. Même si pour moi, "Arithmétique flottante" désignait plus les calculs avec des nombres flottants (donc la partie suivante, parce que je pense qu'après avoir détaillé on aura une partie entière consacrée aux opérations). J'avais aussi songé à "Un peu de mathématiques", mais c'est moins classe.
+
+
+<citation rid="6408481">Il y a de quoi écrire un roman si Maelan44 veut vraiment faire une partie sur nos histoires de processeurs ! Je comprendrais aprfaitement que celui ne veuille pas parler de tout ça.</citation>
+Personnellement, je reconnais que je suis largué pour l'instant. À la limite, vous POURRIEZ (conditionnel) vous charger de rédiger une partie là-dessus, puisque vous semblez avoir fait des recherches. Si vous êtes d'accord et motivés, bien sûr, je ne vais pas vous demander de bosser à ma place. Peut-être que j'essaierais de rattraper le train plus tard avec toutes les infos que vous donnez ici (pas avant mon retour en tous cas).
+
+
+Je peux proposer un compromis : je propose le tutoriel à la validation avec son contenu actuel (plus ou moins amélioré, je pense notamment aux conseils de mewtow sur les opérations et à la remarque de yoch sur le code de test de l'implémentation), je pense qu'il tiendra la route comme ça.
+On aura ensuite du temps pour réfléchir à tout ça tranquillement.</citation>
+
+
+
+<citation nom="mewtow">Je passe par une extension de firefox pour avoir ton tutoriel en PDF : PDF créator.
+
+Et tu peux parfaitement envoyer ton tutoriel en validation tel quel, il est suffisamment complet comme cela et ces histoire de processeurs peuvent être remises à plus tard. Je veux bien essayer de faire une partie sur ces histoires de processeurs, mais je ne garantis absolument rien du tout : j'abandonnerais surement en cours de route après avoir essayé ! </citation>
+
+
+
+<citation nom="Sub-Zéro">Arf, ça me rappel trop mon DS d'info que j'ai foiré, la blessure est encore à vif, je sais pas si j'aurais le courage de le lire... >_<</citation>
+
+
+
+</secret>
+
+<titre2>Topic du bêta-test du tuto sur les nombres flottants (2/2)</titre2>
+<secret>
+
+
+
+<citation nom="yoch"><citation rid="6408507">Je peux proposer un compromis : je propose le tutoriel à la validation avec son contenu actuel (plus ou moins amélioré, je pense notamment aux conseils de mewtow sur les opérations et à la remarque de yoch sur le code de test de l'implémentation), je pense qu'il tiendra la route comme ça.</citation>
+Adopté. :) 
+
+<gras>EDIT :</gras> 
+un lien sur le FPU :
+<lien>http://www.website.masmforum.com/tutorials/fptute/</lien>
+
+_________________
+
+J'ai encore des réserves concernant ce passage (après modification) :
+<citation nom="tuto">Cependant, le contraire n'est pas vrai ! Vous pouvez parfaitement avoir une implémentation qui suit IEEE 754 mais qui ne définit pas cette constante. C'est notamment le cas de GCC, en particulier sous Windows.
+<citation nom="Taurre">visiblement, GCC ne définit pas la macroconstante __STDC_IEC_559__, mais laisse cette définition aux headers du système. Or, comme la bibliothèque C de Windows ne supporte pas le C99… :-°</citation></citation>
+Pour moi, il y a amalgame entre GCC et MinGW (!= GCC, même s'il l'utilise). Comme susmentionné, sous Linux la constante est bien définie. La raison pour laquelle MinGW ne définit pas cette macro, selon moi, est que MinGW s'appuie sur le runtime C de Microsoft (msvcrt.dll), donc il y a risque d'incompatibilité avec IEEE 754, donc mieux vaut ne pas définir cette macro. Au passage, ce couplage entre compilateur GCC et runtime MS semble poser <lien url="http://www.phwinfo.com/forum/comp-lang-c/230313-ldbl_max-1-qnan0e-000-mingw-2.html">des problèmes de compatibilité</lien> assez graves pour l'utilisation des <minicode type="c">long double</minicode> (différents, 80 bits pour GCC, 64 bits pour MS).
+
+<titre2>Conclusion</titre2>
+Le passage du tuto est discutable (non fondé explicitement), et la citation qui va avec l'est aussi (c'est une interprétation, on peut expliquer les choses différemment, cf. ci-dessus). Perso, j'aurais écrit quelque chose comme ceci :
+<citation>Cependant, vous pouvez très bien avoir une implémentation qui suit IEE 754 pour la représentation en mémoire des nombres flottants, mais qui ne soit pas totalement compatible IEE 754. Cela semble être le cas de MinGW (GCC pour Windows), qui ne définit pas la macroconstante __STDC_IEC_559__.</citation></citation>
+
+
+
+<citation nom="Maëlan"><citation rid="6408708">un lien sur le FPU : <lien>http://www.website.masmforum.com/tutorials/fptute/</lien></citation>Merci, j'y jetterais un œil lorsque j'en aurais le temps.
+
+_________________
+
+<citation rid="6408708">Pour moi, il y a amalgame entre GCC et MinGW (!= GCC, même s'il l'utilise).</citation>Oui, tu as raison, je vais tâcher de ne pas mélanger MinWG et GCC.
+
+<citation rid="6408708">Comme susmentionné, sous Linux la constante est bien définie. La raison pour laquelle MinGW ne définit pas cette macro, selon moi, est que MinGW s'appuie sur le runtime C de Microsoft (msvcrt.dll), donc il y a risque d'incompatibilité avec IEEE 754, donc mieux vaut ne pas définir cette macro.</citation>Ça revient un peu au même, finalement, non ? Enfin pas exactement, l'explication de Taurre se fonde sur le support de C99, toi tu parles plutôt de celui de IEEE 754, mais c'est le même ordre d'idée.
+
+<citation rid="6408708">Le passage du tuto est discutable (non fondé explicitement), et la citation qui va avec l'est aussi (c'est une interprétation, on peut expliquer les choses différemment, cf. ci-dessus). Perso, j'aurais écrit quelque chose comme ceci :
+<citation>Cependant, vous pouvez très bien avoir une implémentation qui suit IEE 754 pour la représentation en mémoire des nombres flottants, mais qui ne soit pas totalement compatible IEE 754. Cela semble être le cas de MinGW (GCC pour Windows), qui ne définit pas la macroconstante __STDC_IEC_559__.</citation></citation>
+C'est effectivement plus prudent, tu m'as convaincu.
+
+
+<citation rid="6408708">Au passage, ce couplage entre compilateur GCC et runtime MS semble poser <lien url="http://www.phwinfo.com/forum/comp-lang-c/230313-ldbl_max-1-qnan0e-000-mingw-2.html">des problèmes de compatibilité</lien> assez graves pour l'utilisation des <minicode type="c">long double</minicode> (différents, 80 bits pour GCC, 64 bits pour MS).</citation>Merci pour le lien, ça peut me servir si un jour je parle des précisions étendues et de <minicode type="c">long double</minicode>.
+<secret>Au passage je me suis bien tordu devant mon écran en les regardant s'arracher les cheveux pour déterminer à qui est la faute (Microsoft, MinGW, GCC). Avec l'autre qui tente de faire de la pub pour son propre compilateur (un français, à en juger par la signature). :p </secret>
+
+
+Bon, je vais essayer de carburer pour avoir tout bouclé ce soir pour pouvoir l'envoyer à la validation avant mon absence. À moins que je ne laisse en bêta-test jusqu'à fin juillet - début août.</citation>
+
+
+
+<citation nom="yoch"><citation rid="6410026"><citation rid="6408708">Comme susmentionné, sous Linux la constante est bien définie. La raison pour laquelle MinGW ne définit pas cette macro, selon moi, est que MinGW s'appuie sur le runtime C de Microsoft (msvcrt.dll), donc il y a risque d'incompatibilité avec IEEE 754, donc mieux vaut ne pas définir cette macro.</citation>Ça revient un peu au même, finalement, non ? Enfin pas exactement, l'explication de Taurre se fonde sur le support de C99, toi tu parles plutôt de celui de IEEE 754, mais c'est le même ordre d'idée.</citation>
+Non, l'explication originale de Taurre est incompréhensible telle quelle, la version modifiée (si on change le mot 'bibliothèque' par 'headers') est possible, mais la mienne est un peu différente: je soupçonne simplement MinGW de ne pas donner le support IEE 754 à cause du runtime MS employé. Peut-être est-ce ce qu'a voulu dire Taurre.
+Et le problème ici est bien le support de IEE 754 (optionnel si j'ai bien compris), non du C99 (qui n'est pas non plus supporté par le runtime MS, mais c'est une autre histoire).
+
+<citation rid="6410026">Bon, je vais essayer de carburer pour avoir tout bouclé ce soir pour pouvoir l'envoyer à la validation avant mon absence.</citation>
+Bonne chance. :)</citation>
+
+
+
+<citation nom="Maëlan">J'ai modifié la dernière partie pour tenir compte de tes remarques (par rapport à MinGW-GCC-Windows-la macroconstante-pas-définie-enfin-bref, et aussi par rapport au code de vérification). 
+
+Je suis en train d'éplucher l'annexe F du draft par rapport aux opérations, vu que finalement je détaille cet aspect.
+
+<citation rid="6410230">Bonne chance. :)</citation>
+Merci.
+
+Mais je viens de réaliser qu'il manque quelque chose d'essentiel : <gras>une petite présentation de quelques fonctions standards courantes manipulant des flottants</gras> ! Ça ne m'avait même pas traversé l'esprit auparavant.
+Bien sûr les Zér0s peuvent chercher par eux-mêmes mais le but de ce tuto est justement de les initier à l'utilisation des nombres flottants...</citation>
+
+
+
+<citation nom="mewtow">Il manque aussi autre chose.
+
+IEE754 ne standardise que 5 instructions : 
+<liste>	
+<puce>l'addition <minicode type="c">+</minicode>,</puce>	
+<puce>la multiplication <minicode type="c">*</minicode>,</puce>	
+<puce>la soustraction <minicode type="c">-</minicode>,</puce>	
+<puce>la division <minicode type="c">/</minicode>,</puce>	
+<puce>et la racine carrée <minicode type="c">sqrt</minicode>.</puce>
+</liste>
+De plus, tu as oublié les exceptions, qui arrivent lors de calculs particuliers. De temps en temps, le processeur peut être configuré de façon à répondre silencieusement à ces opérations en fournissant un résultat, mais peut aussi être configuré de façon à remonter l'erreur au programme. En voici la liste : 
+<liste>	
+<puce>Invalid operation : opération qui produit un NAN.</puce>	
+<puce>Overflow : résultat trop grand pour être stocké dans un flottant. On répond en arrondissant le résultat vers <math>+\infty</math>.</puce>	
+<puce>Underflow : pareil, mais avec un résultat trop petit. On arrondis souvent à zéro.</puce>	
+<puce>Division par zéro. La réponse silencieuse normale est de répondre + ou - l'infini.</puce>	
+<puce>Inexact : le résultats ne peut être représenté par un flottant et on doit l'arrondir, avec l'un des quatre modes d'arrondis suivant, au choix :
+<liste>	
+<puce>Arrondir vers + l'infini,</puce>	
+<puce>vers - l'infini,</puce>	
+<puce>vers zéro</puce>	
+<puce>vers le nombre flottant le plus proche (le plus souvent utilisé).</puce>
+</liste></puce>
+</liste>
+Ça fait partie intégrante de la norme IEE754. Je serais d'avis de le mettre quelque part dans le tutoriel, das les défaut des nombres flottants.</citation>
+
+
+
+<citation nom="Maëlan"><citation rid="6410638">Il manque aussi autre chose.
+IEE754 ne standardise que 5 instructions :  []</citation>
+C'est rajouté :) (j'ai remanié le paragraphe d'intro de la 2è partie, qui présente IEEE 754).
+
+<citation rid="6410638">De plus, tu as oublié les exceptions, qui arrivent lors de calculs particuliers. [...]
+Ça fait partie intégrante de la norme IEE754. Je serais d'avis de le mettre quelque part dans le tutoriel, das les défaut des nombres flottants.</citation>
+Il va bien falloir le faire... :'( J'ai préféré éviter car pour moi c'était à aborder en même temps que l'utilisation du header <lien url="http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/fenv.h.html"><fenv.h></lien>, que je ne comptais finalement pas mettre vu la taille qu'a déjà ce tutoriel.
+En gros, la partie "Inconvénients" va beaucoup enfler et se détailler pour aborder les calculs, chose que je ne faisait pas avant. Et en conséquence, il va aussi falloir que je retouche à la partie sur la norme, où je disais "<italique>Je ne commente pas la suite de l'annexe F, ça parle des calculs, nous on ne s'est intéressé qu'à la représentation</italique>".
+
+
+<souligne>ÉDIT:</souligne>  Ça y est, c'est fait de façon assez sommaire (comme tu l'as suggéré, dans la partie sur les inconvénients). Je ne parle pas de <fenv.h> pour l'instant, mais je pense que ça va être obligé, parce que sinon les 5 exceptions et les 4 modes d'arrondis, c'est de la belle théorie, c'est beau à lire et tout et tout, mais ça ne sert pas à grand chose de le savoir si on ne peut pas s'en servir. :-° 
+Je n'ai pas encore mis à jour pour les comportements des opérations, il faut que je synthétise le tout.
+Mais ça grossit, ça grossit... ça va devenir intenable là. Je n'ajoute plus rien après ça. :D</citation>
+
+
+
+<citation nom="yoch"><citation rid="6410638">Ça fait partie intégrante de la norme IEE754. Je serais d'avis de le mettre quelque part dans le tutoriel, das les défaut des nombres flottants.</citation>
+Pourquoi dans les défauts ? Ces défauts ne sont pas inhérents aux nombres flottants, ils existent aussi avec les entiers, même si le comportement est différent.
+Le fait qu'une division par zéro renvoie NaN plutôt que de faire planter le programme peut fort bien être vu comme une qualité... :lol:</citation>
+
+
+
+<citation nom="Maëlan"><citation rid="6411772">Le fait qu'une division par zéro renvoie NaN plutôt que de faire planter le programme peut fort bien être vu comme une qualité... :lol:</citation>
+C'est aussi ce que je me disais. Le problème c'est que mon plan actuel ne tient plus la route avec tous ces ajouts.
+Mieux vaut le changer et présenter les problèmes à mesure qu'ils viennent.</citation>
+
+
+
+<citation nom="mewtow">Pour cette histoire de plan, j'aurais bien une idée : tu répartit ta partie défaut des flottants dans les autres sous-parties. Il faut dire que cette partie est très petite, ce qui arrange les choses et me fait douter de sa nécessité.
+
+Par exemple, "Comparaisons avec l'opérateur ==" aurait bien sa place dans la sous-partie "Comparer des nombres flottants".
+
+Le reste aurait sa place dans la seconde partie sur la norme (celle avant la partie nommée "allons plus loin"). Actuellement, cette partie enseigne comment sont représentés nos nombres flottants en mémoire et se focalise donc sur une petite aprtie de la norme, oubliant exceptions et modes arrondis (attention, pas besoin de rajouter plus que ce que tu as écrit dans la partie sur les défauts des flottants).
+
+A toi de voir. </citation>
+
+
+
+<citation nom="Maëlan">J'ai remanié un peu le plan (plus les titres des parties et leurs intros) : la partie "Inconvénients" a disparu, une partie "Exceptions et arrondis" est apparue à la place.
+
+Finalement, je n'aurais pas fini aujourd'hui. :(
+Tant pis, je vais le laisser en bêta-test jusqu'à mon retour.
+
+C'est la partie "Exceptions et arrondis" qui est à revoir. J'y ai ajouté des bandeaux rouges pour y signaler ce qu'il me reste à faire.
+
+
+Vous pouvez continuer à poster des remarques !</citation>
+
+
+
+<citation nom="Taurre">Salut,
+
+J'ai lu le tutoriel jusqu'au bout, il est vraiment très intéressant. Bravo et merci  :) 
+Concernant les améliorations, je vois deux petites choses:
+
+<citation nom="Maelan44">
+vous comprenez maintenant pourquoi le bit implicite est à 0 pour un nombre dénormalisé.
+</citation>
+
+Non  :p 
+Très franchement, j'ai eu bon lire et relire les explications qui précède cette phrase, je ne vois rien qui explique pourquoi le bit implicite est à zéro... C'est peut-être moi après tout, mais bon  :-° 
+
+<citation nom="Maelan44">
+Le type par défaut d'une constante à virgule flottante est double, mais on peut le changer avec un suffixe collé après la constante :
+# la lettre 'F' minuscule ou majuscule demande un float ;
+# la lettre 'L' minuscule ou majuscule demande un long double.
+</citation>
+
+On peut aussi noté la possibilité d'écrire des constantes hexadécimale flottante (si si  :D ). Dans un tel cas, l'exposant est précédé de la lettre <minicode type="c">'P'</minicode> et est en base deux. Exemple pour le nombre <minicode type="c">-3141.5</minicode>:
+
+<code type="c">
+-0x1.88bP8
+</code>
+
+On peut obtenir un nombre sous cette forme via le format <minicode type="c">"%a"</minicode> de <italique>printf</italique> (ajout du C99).
+Sinon, j'ai remarqué deux petites erreurs de frappe:
+
+<citation nom="Maelan44">
+Vous pouvez utiliser les types flottants dans vos programmes si vous souhaitez manipuler des nombres à virgule, mais également pour stocker de très grands nombres. En effet, un float permet d'atteindre 10^38, et un <barre>float</barre> <gras>double</gras> 10^308 !
+</citation>
+
+<citation nom="Maelan44">
+on opère un décalage de l'exposant réel en lui <barre>ajoutant</barre> <gras>soustrayant</gras> 2e-1-1, où e représente le nombre de bits occupés par l'exposant.
+</citation>
+
+<citation nom="yoch">
+Pour moi, il y a amalgame entre GCC et MinGW (!= GCC, même s'il l'utilise)
+</citation>
+
+Non non, il s'agit bien de GCC. Cette information est tirée de <lien url="http://gcc.gnu.org/c99status.html">cette page</lien> (à la fin, point 2 de "Further notes").
+
+<citation nom="yoch">
+Ça ne veut rien dire. Les macros ne sont pas définies par les bibliothèques, mais dans les headers (en principe), ou directement par le compilo (je crois).
+</citation>
+
+Oui, mea culpa, j'ai bêtement traduit la phrase "gcc doesn't define it, but your libc does" de <lien url="http://groups.google.com/group/gnu.gcc.help/browse_thread/thread/3f8bf1e9f9ea0c68">ce sujet</lien>. Je voulais dire que GCC laisse cette définition aux en-têtes de la bibliothèque standard C du système  >_<</citation>
+
+
+
+<citation nom="Maëlan">Me revoilà !
+
+
+<citation rid="6495602">J'ai lu le tutoriel jusqu'au bout, il est vraiment très intéressant. Bravo</citation>Merci. :) 
+<citation rid="6495602">... et merci  :) </citation>Pourquoi ?
+
+
+<citation rid="6495602"><citation nom="Maelan44">vous comprenez maintenant pourquoi le bit implicite est à 0 pour un nombre dénormalisé.</citation>Non  :p </citation>
+C'est parce que comme on ne peut pas écrire le nombre en notation scientifique tellement il est petit, la partie entière vaut 0. Ça a besoin d'être précisé ?
+
+
+<citation rid="6495602">On peut aussi noter la possibilité d'écrire des constantes hexadécimale flottante (si si  :D ). Dans un tel cas, l'exposant est précédé de la lettre <minicode type="c">'P'</minicode> et est en base deux.</citation>
+Merci, je ne savais pas. Je vais voir ça.
+
+
+<citation rid="6495602"><citation nom="Maelan44">En effet, un float permet d'atteindre 10^38, et un <barre>float</barre> <gras>double</gras> 10^308 !</citation></citation>corrigé !
+
+<citation rid="6495602"><citation nom="Maelan44">on opère un décalage de l'exposant réel en lui <barre>ajoutant</barre> <gras>soustrayant</gras> 2e-1-1, où e représente le nombre de bits occupés par l'exposant.</citation></citation>
+Euh... il n'y a pas de faute ici. Tu as dû comprendre la phrase dans l'autre sens. Peut-être n'est-elle pas assez claire ?
+
+
+<citation rid="6495602"><citation nom="yoch">Pour moi, il y a amalgame entre GCC et MinGW (!= GCC, même s'il l'utilise)</citation>Non non, il s'agit bien de GCC. Cette information est tirée de <lien url="http://gcc.gnu.org/c99status.html">cette page</lien> (à la fin, point 2 de "Further notes").</citation>
+Merci, j'ai pris en compte ta remarque.</citation>
+
+
+
+<citation nom="lucas-84">Bonjour,
+
+Pas grand chose à dire, le tutoriel est très complet et très bien expliqué à la fois. Vraiment, mes félicitations (si celles-ci ont une valeur ! ^^ ).
+J'ai simplement remarqué deux petites erreurs (de frappe sans doute...) :
+- un oubli d'espace avant le point d'exclamation à la fin de l'introduction (à moins que ce soit un problème d'affichage sur mon Smartphone...) ;
+- un 's' au lieu de deux au mot "assistance" dans les remerciements, ainsi qu'un problème d'accord dans cette même phrase : "leurs assistance ?".
+
+Au risque de me répéter, c'est un cours très instructif qui a tout à fait sa place dans les rangs des tutoriels du siteduzero, si ce n'est dans les places d'honneur !
+
+Bonne journée,
+Lucas-84.
+</citation>
+
+
+
+<citation nom="Taurre"><citation rid="6516659"><citation rid="6495602">... et merci  :) </citation>Pourquoi ?</citation>
+
+Pour avoir rédigé un tutoriel de qualité  ;) 
+
+<citation rid="6516659">
+C'est parce que comme on ne peut pas écrire le nombre en notation scientifique tellement il est petit, la partie entière vaut 0. Ça a besoin d'être précisé ?
+</citation>
+
+Je pense que ce serait bien de le préciser. Personnellement, je ne l'ai pas compris en lisant les explications qui précède.
+
+<citation rid="6516659">
+Euh... il n'y a pas de faute ici. Tu as dû comprendre la phrase dans l'autre sens. Peut-être n'est-elle pas assez claire?
+</citation>
+
+Oui en effet, j'ai confondu exposant réel et décalé, désolé  >_<</citation>
+
+
+
+<citation nom="Maëlan">Merci <gras>lucas-84</gras> pour ta lecture attentive ! Ça m'apprendra à taper trop vite.
+Pour le point d'exclamation à la fin de l'introduction, c'est tout à fait normal, car c'est de l'anglais et en anglais il n'y a pas d'espace avant les signes de ponctuation. ;) 
+
+<citation rid="6516823">Je pense que ce serait bien de le préciser. Personnellement, je ne l'ai pas compris en lisant les explications qui précèdent.</citation>
+Je vais le faire dans ce cas.
+
+ÉDIT: En fait, j'ai juste déplacé la phrase en question ("Vous comprenez maintenant pourquoi le bit implicite est à 0 pour un nombre dénormalisé") après le schéma, vu que je pense qu'il suffit pour comprendre. Ça te convient maintenant ?
+
+
+ÉDIT2: J'ai rajouté ta remarque concernant les constantes hexadécimales. Je voudrais juste te signaler que la notation de 3141,5 n'est pas <minicode type="c">0x1.88Bp8</minicode> comme tu l'as dit, mais <minicode type="c">0xC45.8</minicode> (je vois d'où vient ton erreur, tu t'es emmêlé les pinceaux ^^ ).</citation>
+
+
+
+<citation nom="lucas-84"><citation rid="6516871">Merci <gras>lucas-84</gras> pour ta lecture attentive ! Ça m'apprendra à taper trop vite.
+Pour le point d'exclamation à la fin de l'introduction, c'est tout à fait normal, car c'est de l'anglais et en anglais il n'y a pas d'espace avant les signes de ponctuation. ;) </citation>
+En effet, je n'y avais pas pensé.</citation>
+
+
+
+<citation nom="Taurre"><citation rid="6516871">
+ÉDIT: En fait, j'ai juste déplacé la phrase en question ("Vous comprenez maintenant pourquoi le bit implicite est à 0 pour un nombre dénormalisé") après le schéma, vu que je pense qu'il suffit pour comprendre. Ça te convient maintenant?
+</citation>
+
+Je pense que c'est mieux en effet. Maintenant, je propose la petite explication en secret juste en dessous, histoire que tout le monde ait la réponse  :D
+
+<secret>
+Ces nombres sont tellement petits que leur partie entière est nulle  ;) 
+</secret>
+
+<citation rid="6516871">
+ÉDIT2: J'ai rajouté ta remarque concernant les constantes hexadécimales. Je voudrais juste te signaler que la notation de 3141,5 n'est pas <minicode type="c">0x1.88Bp8</minicode> comme tu l'as dit, mais <minicode type="c">0xC45.8</minicode> (je vois d'où vient ton erreur, tu t'es emmêlé les pinceaux ^^ ).
+</citation>
+
+<souligne><gras>EDIT:</gras></souligne> c'était une faute de frappe de ma part, l'exposant vaut <minicode type="c">11</minicode> et non <minicode type="c">8</minicode>, désolé  >_< 
+Les deux écritures <minicode type="c">0x1.88Bp11</minicode> et <minicode type="c">0xC45.8p0</minicode> sont correctes, la première permet de bien voir la représentation IEEE 754 du nombre flottants (même le bit implicite), la seconde est plus intuitive (on transforme la partie entière en hexadécimal (3145 => C45) et ensuite, on part d'une fraction pour la partie décimale: 0.5 = 1/2, 16/2 = 8 => 0.8).
+
+Sinon, juste pour dire, une constante hexadécimale flottante doit <gras>toujours</gras> avoir un exposant, donc pour <minicode type="c">3141.5</minicode> c'est <minicode type="c">0xC45.8p0</minicode>. Également, j'ai remarquer une petite erreur de frappe dans les explications sur ce point:
+
+<citation nom="Maelan44">
+Enfin, il peut être utile de savoir que le C99 permet aussi d'écrire ses constantes flottantes en hexadécimal ! :diable: Pour cela, ajoutez le préfixe 0x avant votre constante (mais après le signe) et écrivez la partie significative en base 16 (c'est-à-dire avec les chiffres de 0 à 9 et les lettres de A à F). L'exposant doit être écrit en base <barre>10</barre> <gras>2</gras> et précédé de la lettre p (ou P) et non e, car cette dernière fait partie des chiffres hexadécimaux ; de plus, il se réfère à une puissance de 2 et non de 10.
+</citation></citation>
+
+
+
+<citation nom="Maëlan"><citation rid="6519047">Maintenant, je propose la petite explication en secret juste en dessous, histoire que tout le monde ait la réponse :D </citation>Est-ce vraiment nécessaire ? Désolé d'insister, mais je n'ai pas envie de surcharger le tutoriel avec des explications superflues (il est déjà bien assez gros).
+
+<citation rid="6519047">Sinon, juste pour dire, une constante hexadécimale flottante doit <gras>toujours</gras> avoir un exposant, donc pour <minicode type="c">3141.5</minicode> c'est <minicode type="c">0xC45.8p0</minicode>.</citation>
+En effet, j'ai lu un peu vite le draft. :-° Je vais le préciser de ce pas.
+
+<citation rid="6519047">Également, j'ai remarqué une petite erreur de frappe dans les explications sur ce point:<citation nom="Maelan44">L'exposant doit être écrit en base <gras>10</gras> <barre>2</barre> et précédé de la lettre p (ou P) et non e, car cette dernière fait partie des chiffres hexadécimaux ; de plus, <gras>il se réfère à une puissance de 2</gras> et non de 10.</citation></citation>
+Euh, non, c'est bien 10.
+En fait, cette phrase signifie que dans le code source, on <souligne>écrit</souligne> le nombre symbolisant l'exposant <souligne>avec la base <gras>10</gras></souligne>. Toutefois, cet exposant est relatif à une <souligne>puissance</souligne> de <gras>2</gras> et non 10. Je ne suis pas assez clair ?</citation>
+
+
+
+<citation nom="Taurre"><citation rid="6519504">
+Est-ce vraiment nécessaire ? Désolé d'insister, mais je n'ai pas envie de surcharger le tutoriel avec des explications superflues (il est déjà bien assez gros).
+</citation>
+
+Je disais juste cela parce qu'en ce qui me concerne, je ne le comprend pas en lisant ce qui précède, mais bon c'est peut-être moi qui suis tordu.  :-° 
+L'explication supplémentaire n'est pas forcément nécessaire.
+
+<citation rid="6519504">
+En fait, cette phrase signifie que dans le code source, on <souligne>écrit</souligne> le nombre symbolisant l'exposant <souligne>avec la base <gras>10</gras></souligne>. Toutefois, cet exposant est relatif à une <souligne>puissance</souligne> de <gras>2</gras> et non 10. Je ne suis pas assez clair ?
+</citation>
+
+Je vois que j'ai encore lu un peu vite  >_< 
+Sinon, je pense que cette précision n'est pas nécessaire et est sujette à confusion. Il me semble qu'il est mieux de se contenter de:
+
+<citation>
+L'exposant est une puissance de 2 (et non de 10) et est précédé de la lettre p (ou P).
+</citation></citation>
+
+
+
+<citation nom="lucas-84">Temps d'étude : 4h02 ? C'est précis ! :-°</citation>
+
+
+
+<citation nom="Maëlan"><citation rid="6520591">Sinon, je pense que cette précision n'est pas nécessaire et est sujette à confusion</citation>
+J'ai préféré le rajouter, parce que sinon on pourrait croire qu'il faut aussi l'écrire en hexadécimal. C'est vrai que pour le coup ça fait pavé lourd à digérer (c'est aussi pourquoi je l'ai présenté sous forme de liste, finalement), mais je pense que c'est indispensable. Je vais essayer de clarifier la phrase, mais je ne promets rien.
+ÉDIT: C'est fait. C'est mieux comme ça ?
+
+<citation rid="6520774">Temps d'étude : 4h02 ? C'est précis !  :-°</citation>Ben oui. :) Finalement, je me demandais si 4h03 ne serait pas plus adapté ; qu'en penses-tu ?</citation>
+
+
+
+<citation nom="Taurre"><citation rid="6521117">
+J'ai préféré le rajouter, parce que sinon on pourrait croire qu'il faut aussi l'écrire en hexadécimal. C'est vrai que pour le coup ça fait pavé lourd à digérer (c'est aussi pourquoi je l'ai présenté sous forme de liste, finalement), mais je pense que c'est indispensable. Je vais essayer de clarifier la phrase, mais je ne promets rien.
+ÉDIT: C'est fait. C'est mieux comme ça ?
+</citation>
+
+Cela m'a l'air plus clair comme cela en effet  ;)</citation>
+
+
+
+<citation nom="Maëlan">Le tutoriel est finalisé, je vais l'envoyer en validation. A moins que vous n'ayez encore des remarques sur les dernières modifications. Pour infos, elles concernent surtout la <lien url="http://www.siteduzero.com/tutoriel-3-494982-1-maitrisez-les-nombres-a-virgule-en-c.html#ss_part_1">partie I ("Présentation")</lien> et la <lien url="http://www.siteduzero.com/tutoriel-3-494982-1-maitrisez-les-nombres-a-virgule-en-c.html#ss_part_4">partie IV ("Exceptions & arrondis")</lien> qui se sont étoffées.
+
+<gras>Je voudrais tous vous remercier pour le temps que vous avez consacré à ce tutoriel et l'assistance que vous m'avez fournie.</gras></citation></secret>
